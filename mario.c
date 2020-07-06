@@ -24,17 +24,19 @@ int print_character(int value, char character)
 }
 
 // Prints the pyramids
-int print_pyramids(int height, int height_accumulator)
+int print_pyramids(int height, int accumulator)
 {
-    if (height_accumulator > 0)
+    if (accumulator > 0)
     {
+        const int decremented = accumulator - 1;
+        const int pound = height - decremented;
         // Add padding for left pyramid
-        print_character(height_accumulator - 1, ' ');
-        print_character(height - (height_accumulator - 1), '#');
+        print_character(decremented, ' ');
+        print_character(pound, '#');
         print_character(2, ' ');
-        print_character(height - (height_accumulator - 1), '#');
+        print_character(pound, '#');
         putchar('\n');
-        return print_pyramids(height, height_accumulator - 1);
+        return print_pyramids(height, decremented);
     }
     return 0;
 }
