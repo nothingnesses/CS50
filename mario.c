@@ -29,12 +29,12 @@ int print_pyramids(int height, int accumulator)
     if (accumulator > 0)
     {
         const int decremented = accumulator - 1;
-        const int pound = height - decremented;
+        const int hash = height - decremented;
         // Add padding for left pyramid
         print_character(decremented, ' ');
-        print_character(pound, '#');
+        print_character(hash, '#');
         print_character(2, ' ');
-        print_character(pound, '#');
+        print_character(hash, '#');
         putchar('\n');
         return print_pyramids(height, decremented);
     }
