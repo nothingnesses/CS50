@@ -15,27 +15,29 @@ int sum_product_digits(int input_a, int input_b)
 {
     const int product = input_a * input_b;
     return (product > 9)
-               ? (product % 10) + (product / 10)
-               : product;
+           ? (product % 10) + (product / 10)
+           : product;
 }
 
 // Returns a `Luhn` instance for `luhn_evaluate` with a variable 3rd field
 Luhn luhn_instance(Luhn input, int third_field)
 {
-    return (Luhn){
+    return (Luhn)
+    {
         input.number / 10,
-        !input.other,
-        third_field};
+                     !input.other,
+                     third_field
+    };
 }
 
 // Evaluates a `Luhn` struct
 Luhn luhn_evaluate(Luhn input)
 {
     return (input.number > 1)
-               ? luhn_evaluate((input.other)
-                                   ? luhn_instance(input, input.accumulator + sum_product_digits(2, input.number % 10))
-                                   : luhn_instance(input, input.accumulator + (input.number % 10)))
-               : input;
+           ? luhn_evaluate((input.other)
+                           ? luhn_instance(input, input.accumulator + sum_product_digits(2, input.number % 10))
+                           : luhn_instance(input, input.accumulator + (input.number % 10)))
+           : input;
 }
 
 // Returns type of card number, AMEX, MASTERCARD, VISA, or INVALID
@@ -45,13 +47,12 @@ string card_number_type(long input)
     // Divide by 1e12 to decrease amount of 0s so I don't have to type as many zeros
     const int start_digits = input / 1e12;
     // Test if input passes Luhn algorithm
-    if (luhn_evaluate((Luhn){
-                          input,
-                          false,
-                          0})
-                .accumulator %
-            10 ==
-        0)
+    if (luhn_evaluate((Luhn)
+{
+    input,
+    false,
+    0
+}).accumulator % 10 == 0)
     {
         // Test if input passes range checks
         if ((start_digits > 339 && start_digits < 350) || (start_digits > 369 && start_digits < 380))
