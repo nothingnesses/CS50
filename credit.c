@@ -53,7 +53,7 @@ int long_length(long input, int accumulator) {
 // Returns type of card number, AMEX, MASTERCARD, VISA, or INVALID
 string card_number_type(long input) {
   const string invalid = "INVALID\n";
-  const int start_digits = input / 10000000000000;
+  const int start_digits = input / 100000000000;
   if (luhn_valid((Luhn){
     input,
     false,
