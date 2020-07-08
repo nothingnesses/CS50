@@ -63,7 +63,7 @@ string card_number_type(long input) {
       return "AMEX\n";
     } else if (start_digits > 50999 && start_digits < 56000) {
       return "MASTERCARD\n";
-    } else if (start_digits == 4 || (start_digits > 3999 && start_digits < 5000)) {
+    } else if (start_digits == 4 || (start_digits > 39999 && start_digits < 50000)) {
       return "VISA\n";
     } else {
       return invalid;
