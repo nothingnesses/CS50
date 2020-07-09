@@ -71,7 +71,6 @@ char digit_to_ascii(int input) {
 string coleman_liau(Text input, char *output) {
   const float multiplier = 100 / (float)input.words;
   const float index = round(0.0588 * ((float)input.letters * multiplier) - 0.296 * ((float)input.sentences * multiplier) - 15.8);
-  printf("letters: %i\nwords: %i\nsentences: %i\n", input.letters, input.words, input.sentences);
   if (index >= 16) {
     return "Grade 16+\n";
   } else if (index < 1) {
