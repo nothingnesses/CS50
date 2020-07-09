@@ -50,16 +50,12 @@ Text text_evaluate(Text input) {
   ? is_letter(current_character)
     // Current character is a letter, increment letter count.
     ? text_evaluate(text_instance(input, input.letters + 1, input.words, input.sentences, 1))
-    : (is_whitespace(current_character) && !is_whitespace(previous_character))
+    : (is_whitespace(current_character) && !is_whitespace(previous_character) && !is_end_mark(previous_character))
       ? text_evaluate(text_instance(input, input.letters, input.words + 1, input.sentences, 1))
       : (is_end_mark(current_character) && !is_end_mark(previous_character))
         ? text_evaluate(text_instance(input, input.letters, input.words + 1, input.sentences + 1, 1))
         : text_evaluate(text_instance(input, input.letters, input.words, input.sentences, 1))
-  // Current character is a null. Is the previous character a letter?
-  : is_letter(previous_character)
-    // Current character is a null. Previous character is a letter. Increment word count.
-    ? text_instance(input, input.letters, input.words + 1, input.sentences, 0)
-    : input;
+  : input;
 }
 
 // Convert numeric digit to ASCII code equivalent
