@@ -23,7 +23,7 @@ bool is_end_mark(char input) {
   return (input == '!' || input == '.' || input == '?');
 }
 
-// Determines if input is whitespace
+// Determines if input is a whitespace character
 bool is_whitespace(char input) {
   return (input == ' ' || input == '\t' || input == '\n' || input == '\r');
 }
@@ -59,7 +59,7 @@ Text text_evaluate(Text input) {
   : is_letter(previous_character)
     // Current character is a null. Previous character is a letter. Increment word count.
     ? luhn_instance(input, input.letters, input.words + 1, input.sentences, 0)
-    // Current character is a null. Previous character is not a letter. Is previous character an end mark and ?
+    // Current character is a null. Previous character is not a letter. Is previous character an end mark and word count > 0?
     : (is_end_mark(previous_character) && input.words > 0)
       // Current character is a null. Previous character is an end mark and word count is > 0. Increment sentence counter.
       ? luhn_instance(input, input.letters, input.words, input.sentences + 1, 0)
@@ -82,14 +82,12 @@ string coleman_liau(Text input, char *output) {
     return "Before Grade 1\n";
   } else {
     if (index > 9) {
-      // Allocate enough memory for "Grade " + a two-digit number + '\n' + terminating character
       output[6] = digit_to_ascii((int)index / 10);
       output[7] = digit_to_ascii((int)index % 10);
       output[8] = '\n';
       output[9] = '\0';
       return output;
     } else {
-      // Allocate enough memory for "Grade " + a one-digit number + '\n' + terminating character
       output[6] = digit_to_ascii((int)index);
       output[7] = '\n';
       output[8] = '\0';
@@ -99,6 +97,7 @@ string coleman_liau(Text input, char *output) {
 }
 
 int main(void) {
+  // Allocate enough memory for "Grade " + a two-digit number + '\n' + terminating character
   char output[10] = "Grade ";
   printf("%s",
     coleman_liau(text_evaluate((Text) {
