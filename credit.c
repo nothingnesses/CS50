@@ -78,7 +78,7 @@ string card_number_type(long input)
     }
 }
 
-int main(int argc, char const *argv[])
+int main(void)
 {
     printf("%s", card_number_type(get_long("Number: ")));
     return 0;
