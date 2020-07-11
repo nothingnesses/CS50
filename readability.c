@@ -62,9 +62,25 @@ char *coleman_liau(Text input) {
   const float index = round(0.0588 * ((float)input.letters * multiplier) - 0.296 * ((float)input.sentences * multiplier) - 15.8);
   // printf("Letters: %i\nWords: %i\nSentences: %i\n", input.letters, input.words, input.sentences);
   if (index >= 16) {
-    return "Grade 16+\n";
+    // + 1 for '\0'
+    int output_length = snprintf(NULL, 0, "Grade 16+\n") + 1;
+    char *output = malloc(output_length);
+    if (output == NULL) {
+      exit(EXIT_FAILURE);
+    } else {
+      snprintf(output, output_length, "Grade 16+\n");
+      return output;
+    }
   } else if (index < 1) {
-    return "Before Grade 1\n";
+    // + 1 for '\0'
+    int output_length = snprintf(NULL, 0, "Before Grade 1\n") + 1;
+    char *output = malloc(output_length);
+    if (output == NULL) {
+      exit(EXIT_FAILURE);
+    } else {
+      snprintf(output, output_length, "Before Grade 1\n");
+      return output;
+    }
   } else {
     // + 1 for '\0'
     int output_length = snprintf(NULL, 0, "Grade %i\n", (int)index) + 1;
