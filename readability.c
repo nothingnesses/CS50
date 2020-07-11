@@ -56,31 +56,29 @@ Text text_evaluate(Text input) {
   : input;
 }
 
+// Stores output information
+typedef struct Output {
+  const bool is_malloced;
+  char *output;
+} Output;
+
+// Returns an `Output` instance
+Output output_instance(bool is_malloced, char *output) {
+  return (Output) {
+    is_malloced,
+    output
+  };
+}
+
 // Calculates readability information using the Coleman-Liau formula
-char *coleman_liau(Text input) {
+Output coleman_liau(Text input) {
   const float multiplier = 100 / (float)input.words;
   const float index = round(0.0588 * ((float)input.letters * multiplier) - 0.296 * ((float)input.sentences * multiplier) - 15.8);
   // printf("Letters: %i\nWords: %i\nSentences: %i\n", input.letters, input.words, input.sentences);
   if (index >= 16) {
-    // + 1 for '\0'
-    int output_length = snprintf(NULL, 0, "Grade 16+\n") + 1;
-    char *output = malloc(output_length);
-    if (output == NULL) {
-      exit(EXIT_FAILURE);
-    } else {
-      snprintf(output, output_length, "Grade 16+\n");
-      return output;
-    }
+    return output_instance(false, "Grade 16+\n");
   } else if (index < 1) {
-    // + 1 for '\0'
-    int output_length = snprintf(NULL, 0, "Before Grade 1\n") + 1;
-    char *output = malloc(output_length);
-    if (output == NULL) {
-      exit(EXIT_FAILURE);
-    } else {
-      snprintf(output, output_length, "Before Grade 1\n");
-      return output;
-    }
+    return output_instance(false, "Before Grade 1\n");
   } else {
     // + 1 for '\0'
     int output_length = snprintf(NULL, 0, "Grade %i\n", (int)index) + 1;
@@ -89,20 +87,22 @@ char *coleman_liau(Text input) {
       exit(EXIT_FAILURE);
     } else {
       snprintf(output, output_length, "Grade %i\n", (int)index);
-      return output;
+      return output_instance(true, output);
     }
   }
 }
 
 int main(void) {
-  char *output = coleman_liau(text_evaluate((Text) {
+  Output output = coleman_liau(text_evaluate((Text) {
       get_string("Text: "),
       0,
       0,
       0,
       0
     }));
-  printf("%s", output);
-  free(output);
+  printf("%s", output.output);
+  if (output.is_malloced) {
+    free(output.output);
+  }
   return 0;
 }
