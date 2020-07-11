@@ -83,7 +83,7 @@ Output coleman_liau(Text input) {
     return output_instance(false, "Before Grade 1\n");
   } else {
     // + 1 for '\0'
-    int output_length = snprintf(NULL, 0, "Grade %i\n", (int)index) + 1;
+    const int output_length = snprintf(NULL, 0, "Grade %i\n", (int)index) + 1;
     char *output = malloc(output_length);
     if (output == NULL) {
       exit(EXIT_FAILURE);
