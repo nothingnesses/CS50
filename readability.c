@@ -79,15 +79,14 @@ char *coleman_liau(Text input) {
 }
 
 int main(void) {
-  // Allocate enough memory for "Grade " + a two-digit number + '\n' + terminating character
-  char output[10] = "Grade ";
-  printf("%s",
-    coleman_liau(text_evaluate((Text) {
+  char *output = coleman_liau(text_evaluate((Text) {
       get_string("Text: "),
       0,
       0,
       0,
       0
-    })));
+    }));
+  printf("%s", output);
+  free(output);
   return 0;
 }
