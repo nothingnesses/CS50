@@ -43,7 +43,9 @@ Text text_instance(Text *input, int letters, int words, int sentences) {
 // Evaluates the information of a `Text` struct
 Text text_evaluate(Text input) {
   const char current_character = input.text[input.accumulator];
-  // This line might be bad because it reads data outside (before) the string
+  if (input.accumulator == 0) {
+    return text_evaluate(text_instance(&input, input.letters + 1, input.words, input.sentences));
+  }
   const char previous_character = input.text[input.accumulator - 1];
   return (current_character != '\0')
   ? is_letter(current_character)
