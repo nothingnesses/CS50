@@ -30,13 +30,13 @@ bool is_whitespace(char input) {
 }
 
 // Returns a `Text` instance for `text_evaluate` with variable `letters`, `words` and `sentences` fields
-Text text_instance(Text input, int letters, int words, int sentences) {
+Text text_instance(Text *input, int letters, int words, int sentences) {
   return (Text) {
-    input.text,
+    input->text,
     letters,
     words,
     sentences,
-    input.accumulator + 1
+    input->accumulator + 1
   };
 }
 
@@ -47,12 +47,12 @@ Text text_evaluate(Text input) {
   const char previous_character = input.text[input.accumulator - 1];
   return (current_character != '\0')
   ? is_letter(current_character)
-    ? text_evaluate(text_instance(input, input.letters + 1, input.words, input.sentences))
+    ? text_evaluate(text_instance(&input, input.letters + 1, input.words, input.sentences))
     : (is_whitespace(current_character) && !is_whitespace(previous_character) && !is_end_mark(previous_character))
-      ? text_evaluate(text_instance(input, input.letters, input.words + 1, input.sentences))
+      ? text_evaluate(text_instance(&input, input.letters, input.words + 1, input.sentences))
       : (is_end_mark(current_character) && !is_end_mark(previous_character))
-        ? text_evaluate(text_instance(input, input.letters, input.words + 1, input.sentences + 1))
-        : text_evaluate(text_instance(input, input.letters, input.words, input.sentences))
+        ? text_evaluate(text_instance(&input, input.letters, input.words + 1, input.sentences + 1))
+        : text_evaluate(text_instance(&input, input.letters, input.words, input.sentences))
   : input;
 }
 
