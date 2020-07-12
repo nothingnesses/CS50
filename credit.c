@@ -10,7 +10,7 @@ typedef struct Luhn {
 } Luhn;
 
 // Returns the sum of product's digits
-int sum_product_digits(int input_a, int input_b) {
+int sum_product_digits(const int input_a, const int input_b) {
   const int product = input_a * input_b;
   return (product > 9)
   ? (product % 10) + (product / 10)
@@ -18,7 +18,7 @@ int sum_product_digits(int input_a, int input_b) {
 }
 
 // Returns a `Luhn` instance for `luhn_evaluate` with a variable 3rd field
-Luhn luhn_instance(Luhn *input, int third_field) {
+Luhn luhn_instance(const Luhn *input, const int third_field) {
   return (Luhn) {
     input->number / 10,
     !input->other,
@@ -27,7 +27,7 @@ Luhn luhn_instance(Luhn *input, int third_field) {
 }
 
 // Evaluates a `Luhn` struct
-Luhn luhn_evaluate(Luhn input) {
+Luhn luhn_evaluate(const Luhn input) {
   return (input.number > 1)
   ? luhn_evaluate((input.other)
     ? luhn_instance(&input, input.accumulator + sum_product_digits(2, input.number % 10))
@@ -36,7 +36,7 @@ Luhn luhn_evaluate(Luhn input) {
 }
 
 // Returns type of card number, AMEX, MASTERCARD, VISA, or INVALID
-const char *card_number_type(long input) {
+const char *card_number_type(const long input) {
   const char *invalid = "INVALID\n";
   // Divide by 1e12 to decrease place value so I don't have to type as many digits later
   const int start_digits = input / 1e12;
