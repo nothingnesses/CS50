@@ -30,7 +30,7 @@ Characters characters_instance(const char character, const int amount, char *out
 }
 
 // Evaluates a `Characters` struct
-Characters evaluate_characters(Characters input) {
+Characters evaluate_characters(const Characters input) {
   if (input.amount > 0) {
     const int output_length = snprintf(NULL, 0, "%s%c", input.output, input.character) + 1;
     char *output_buffer = malloc(output_length);
@@ -63,12 +63,12 @@ typedef struct Pyramids {
 
 // Returns a `Pyramids` instance
 Pyramids pyramid_instance(
-  Pyramids *input,
-  int accumulator,
+  const Pyramids *input,
+  const int accumulator,
   char *output,
-  bool is_malloced,
-  Characters left_padding_buffer,
-  Characters pounds_buffer
+  const bool is_malloced,
+  const Characters left_padding_buffer,
+  const Characters pounds_buffer
   ) {
   return (Pyramids) {
     input->height,
@@ -81,7 +81,7 @@ Pyramids pyramid_instance(
 }
 
 // Evaluates a `Pyramids` struct
-Pyramids pyramid_evaluate(Pyramids input) {
+Pyramids pyramid_evaluate(const Pyramids input) {
   if (input.accumulator > 0) {
     const int decremented = input.accumulator - 1;
     const Characters left_padding_buffer = evaluate_characters(characters_instance(' ', decremented, "", false));
@@ -136,7 +136,7 @@ Pyramids pyramid_evaluate(Pyramids input) {
 
 int main(void) {
   const int height = get_height(get_int("Height: "));
-  Pyramids pyramids = pyramid_evaluate((Pyramids) {
+  const Pyramids pyramids = pyramid_evaluate((Pyramids) {
     height,
     height,
     "",
