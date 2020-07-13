@@ -5,7 +5,7 @@
 #include <cs50.h>
 
 // Pesters user until they return a valid value for height
-int get_height(int integer)
+int get_height(int const integer)
 {
     return (integer > 8 || integer < 1)
            ? get_height(get_int("Height: "))
@@ -15,14 +15,14 @@ int get_height(int integer)
 // Stores character information
 typedef struct Characters
 {
-    const char character;
-    const int amount;
+    char const character;
+    int const amount;
     char *output;
-    const bool is_malloced;
+    bool const is_malloced;
 } Characters;
 
 // Returns a `Characters` instance
-Characters characters_instance(const char character, const int amount, char *output, const bool is_malloced)
+Characters characters_instance(char const character, int const amount, char *output, bool const is_malloced)
 {
     return (Characters)
     {
@@ -34,7 +34,7 @@ Characters characters_instance(const char character, const int amount, char *out
 }
 
 // Evaluates a `Characters` struct
-Characters evaluate_characters(const Characters input)
+Characters evaluate_characters(Characters const input)
 {
     if (input.amount > 0)
     {
@@ -66,22 +66,22 @@ Characters evaluate_characters(const Characters input)
 // Stores pyramids information
 typedef struct Pyramids
 {
-    const int height;
-    const int accumulator;
+    int const height;
+    int const accumulator;
     char *output;
-    const bool is_malloced;
-    const Characters left_padding_buffer;
-    const Characters pounds_buffer;
+    bool const is_malloced;
+    Characters const left_padding_buffer;
+    Characters const pounds_buffer;
 } Pyramids;
 
 // Returns a `Pyramids` instance
 Pyramids pyramid_instance(
-    const Pyramids *input,
-    const int accumulator,
+    Pyramids const *input,
+    int const accumulator,
     char *output,
-    const bool is_malloced,
-    const Characters left_padding_buffer,
-    const Characters pounds_buffer
+    bool const is_malloced,
+    Characters const left_padding_buffer,
+    Characters const pounds_buffer
 )
 {
     return (Pyramids)
@@ -96,16 +96,16 @@ Pyramids pyramid_instance(
 }
 
 // Evaluates a `Pyramids` struct
-Pyramids pyramid_evaluate(const Pyramids input)
+Pyramids pyramid_evaluate(Pyramids const input)
 {
     if (input.accumulator > 0)
     {
-        const int decremented = input.accumulator - 1;
-        const Characters left_padding_buffer = evaluate_characters(characters_instance(' ', decremented, "", false));
-        const char *left_padding = left_padding_buffer.output;
-        const Characters pounds_buffer = evaluate_characters(characters_instance('#', input.height - decremented, "", false));
-        const char *pounds = pounds_buffer.output;
-        const int output_length = snprintf(
+        int const decremented = input.accumulator - 1;
+        Characters const left_padding_buffer = evaluate_characters(characters_instance(' ', decremented, "", false));
+        char const *left_padding = left_padding_buffer.output;
+        Characters const pounds_buffer = evaluate_characters(characters_instance('#', input.height - decremented, "", false));
+        char const *pounds = pounds_buffer.output;
+        int const output_length = snprintf(
                                       NULL,
                                       0,
                                       "%s%s%s  %s\n",
@@ -132,7 +132,7 @@ Pyramids pyramid_evaluate(const Pyramids input)
                 pounds,
                 pounds
             );
-            const Pyramids output = pyramid_evaluate(pyramid_instance(&input, decremented, output_buffer, true, left_padding_buffer,
+            Pyramids const output = pyramid_evaluate(pyramid_instance(&input, decremented, output_buffer, true, left_padding_buffer,
                                     pounds_buffer));
             if (input.left_padding_buffer.is_malloced)
             {
@@ -162,8 +162,8 @@ Pyramids pyramid_evaluate(const Pyramids input)
 
 int main(void)
 {
-    const int height = get_height(get_int("Height: "));
-    const Pyramids pyramids = pyramid_evaluate((Pyramids)
+    int const height = get_height(get_int("Height: "));
+    Pyramids const pyramids = pyramid_evaluate((Pyramids)
     {
         height,
         height,
