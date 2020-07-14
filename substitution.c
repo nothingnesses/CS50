@@ -18,17 +18,22 @@ bool is_letter(char const input)
     return ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'));
 }
 
+void error(char const *binary_name)
+{
+    printf("Usage: ./%s KEY\nKEY must only contain %i unique letters.", binary_name, ALPHABET_LENGTH);
+}
+
 int main(int const argc, char const *argv[])
 {
     if (argc != 2)
     {
-        printf("Usage: ./substitution key\n");
+        error(argv[0]);
         return 1;
     }
     int const ciphertext_alphabet_length = strlen(argv[1]);
     if (ciphertext_alphabet_length != ALPHABET_LENGTH)
     {
-        printf("Key must contain 26 characters.\n");
+        error(argv[0]);
         return 1;
     }
 
@@ -44,14 +49,14 @@ int main(int const argc, char const *argv[])
             ++ciphertext_character_counter[uppercase_character_index];
             if (ciphertext_character_counter[uppercase_character_index] > 1)
             {
-                printf("Key must not contain duplicate characters.\n");
+                error(argv[0]);
                 return 1;
             }
             cipher[ciphertext_alphabet_index] = (int)uppercase_character - (int)PLAINTEXT_ALPHABET[ciphertext_alphabet_index];
         }
         else
         {
-            printf("Key must contain alphabetic characters only.\n");
+            error(argv[0]);
             return 1;
         }
     }
