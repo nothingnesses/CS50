@@ -82,7 +82,7 @@ void print_winner(void)
     candidate winners[MAX];
     int highest_score = 0;
     int winners_index = 0;
-    for (int candidates_index = 0; candidates_index < MAX; ++candidates_index)
+    for (int candidates_index = 0; candidates_index < candidate_count; ++candidates_index)
     {
         if (candidates[candidates_index].votes > highest_score) {
             for (; winners_index >= 0; --winners_index) {
