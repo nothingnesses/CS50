@@ -5,9 +5,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-char const *PLAINTEXT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-int const ALPHABET_LENGTH = 26;
-int const A_ASCII_CODE = 65;
+char static const *PLAINTEXT_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+enum
+{
+    ALPHABET_LENGTH = 26,
+    A_ASCII_CODE = 65
+};
 
 // Determines if input is a letter
 bool is_letter(char const input)
@@ -44,7 +47,7 @@ int main(int const argc, char const *argv[])
                 printf("Key must not contain duplicate characters.\n");
                 return 1;
             }
-            cipher[ciphertext_alphabet_index] = (int)uppercase_character - (int) PLAINTEXT_ALPHABET[ciphertext_alphabet_index];
+            cipher[ciphertext_alphabet_index] = (int)uppercase_character - (int)PLAINTEXT_ALPHABET[ciphertext_alphabet_index];
         }
         else
         {
