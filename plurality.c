@@ -85,10 +85,9 @@ void print_winner(void)
     for (int candidates_index = 0; candidates_index < candidate_count; ++candidates_index)
     {
         if (candidates[candidates_index].votes > highest_score) {
-            for (; winners_index >= 0; --winners_index) {
-                winners[winners_index] = winners[MAX - 1];
+            for (; winners_index > 0; --winners_index) {
+                winners[winners_index - 1] = winners[MAX - 1];
             }
-            winners_index = 0;
             highest_score = candidates[candidates_index].votes;
         }
         if (candidates[candidates_index].votes >= highest_score) {
@@ -96,8 +95,8 @@ void print_winner(void)
             ++winners_index;
         }
     }
-    for (; winners_index >= 0; --winners_index) {
-        printf("%s\n", winners[winners_index].name);
+    for (; winners_index > 0; --winners_index) {
+        printf("%s\n", winners[winners_index - 1].name);
     }
     return;
 }
