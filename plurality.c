@@ -68,7 +68,7 @@ bool vote(string name)
 {
     for (int candidates_index = 0; candidates_index < MAX; ++candidates_index)
     {
-        if (strcmp(candidates[candidates_index].name, name) == 0) {
+        if (strcmp(candidates[candidates_index].name, name)) {
             ++candidates[candidates_index].votes;
             return true;
         }
