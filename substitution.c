@@ -18,23 +18,22 @@ bool is_letter(char const input)
     return ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'));
 }
 
-void error(char const *binary_name)
+int error(char const *binary_name)
 {
-    printf("Usage: ./%s KEY\nKEY must only contain %i unique letters.", binary_name, ALPHABET_LENGTH);
+    printf("Usage: %s KEY\nKEY must only contain %i unique ASCII letters.\n", binary_name, ALPHABET_LENGTH);
+    return 1;
 }
 
 int main(int const argc, char const *argv[])
 {
     if (argc != 2)
     {
-        error(argv[0]);
-        return 1;
+        return error(argv[0]);
     }
     int const ciphertext_alphabet_length = strlen(argv[1]);
     if (ciphertext_alphabet_length != ALPHABET_LENGTH)
     {
-        error(argv[0]);
-        return 1;
+        return error(argv[0]);
     }
 
     int ciphertext_character_counter[ALPHABET_LENGTH] = {0};
@@ -49,15 +48,13 @@ int main(int const argc, char const *argv[])
             ++ciphertext_character_counter[uppercase_character_index];
             if (ciphertext_character_counter[uppercase_character_index] > 1)
             {
-                error(argv[0]);
-                return 1;
+                return error(argv[0]);
             }
             cipher[ciphertext_alphabet_index] = (int)uppercase_character - (int)PLAINTEXT_ALPHABET[ciphertext_alphabet_index];
         }
         else
         {
-            error(argv[0]);
-            return 1;
+            return error(argv[0]);
         }
     }
 
