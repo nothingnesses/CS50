@@ -49,6 +49,7 @@ int main(int const argc, char const *argv[]) {
   }
 
   char const *plaintext = get_string("plaintext: ");
+  printf("ciphertext: ");
   int plaintext_index = 0;
   int plaintext_length = strlen(plaintext);
   for (; plaintext_index < plaintext_length; ++plaintext_index) {
