@@ -124,8 +124,8 @@ void record_preferences(int ranks[])
 // Record pairs of candidates where one is preferred over the other
 void add_pairs(void)
 {
-    for (int preferences_index_a = 0; preferences_index_a < MAX; ++preferences_index_a) {
-        for (int preferences_index_b = 0; preferences_index_b < MAX; ++preferences_index_b) {
+    for (int preferences_index_a = 0; preferences_index_a < candidate_count; ++preferences_index_a) {
+        for (int preferences_index_b = 0; preferences_index_b < candidate_count; ++preferences_index_b) {
             if (preferences[preferences_index_a][preferences_index_b] != preferences[preferences_index_b][preferences_index_a]) {
                 (preferences[preferences_index_a][preferences_index_b] > preferences[preferences_index_b][preferences_index_a])
                     ? (pairs[pair_count] = (pair){
