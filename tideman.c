@@ -114,10 +114,10 @@ bool vote(int rank, string name, int ranks[])
 void record_preferences(int ranks[])
 {
     int ranks_index = 0;
-    int previous_candidate = -1;
-    for (; ranks_index < candidate_count; previous_candidate = ranks[ranks_index], ++ranks_index) {
-        if (previous_candidate >= 0) {
-            ++preferences[previous_candidate][ranks[ranks_index]];
+    int previous_candidate_index = -1;
+    for (; ranks_index < candidate_count; previous_candidate_index = ranks[ranks_index], ++ranks_index) {
+        if (previous_candidate_index != -1) {
+            ++preferences[previous_candidate_index][ranks[ranks_index]];
         }
     }
     return;
@@ -126,7 +126,18 @@ void record_preferences(int ranks[])
 // Record pairs of candidates where one is preferred over the other
 void add_pairs(void)
 {
-    // TODO
+    int pairs_index = 0;
+    for (int preferences_index_a = 0; preferences_index_a < MAX; ++preferences_index_a) {
+        for (int preferences_index_b = 0; preferences_index_b < MAX; ++preferences_index_b) {
+            if (preferences[preferences_index_a][preferences_index_b] > 0) {
+                pairs[pairs_index] = (pair){
+                    preferences_index_a,
+                    preferences_index_b
+                };
+                ++pairs_index;
+            }
+        }
+    }
     return;
 }
 
