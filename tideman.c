@@ -147,7 +147,7 @@ void add_pairs(void)
 typedef int (*function_type_a)(pair);
 
 int strength(pair input) {
-    return preferences[input.winner][input.loser] - preferences[input.loser][input.winner];
+    return preferences[input.loser][input.winner] - preferences[input.winner][input.loser];
 }
 
 void merge(pair old_array[], pair new_array[], int left_index_input, int right_index_input, int right_end, function_type_a callback_function) {
@@ -180,7 +180,7 @@ void merge_sort(pair input_array[], pair scratch_array[], int array_size) {
         for (int index = 0; index < array_size; index += 2 * sub_array_size) {
             merge(*input_array_address, *scratch_array_address, index, mininum(index + sub_array_size, array_size), mininum(index + 2 * sub_array_size, array_size), (function_type_a)&strength);
         }
-        // Swap arrays
+        // Swap where the array pointers are pointing to
         (input_array_address == &input_array)
           ? (input_array_address = &scratch_array, scratch_array_address = &input_array)
           : (input_array_address = &input_array, scratch_array_address = &scratch_array);
