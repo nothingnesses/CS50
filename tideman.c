@@ -1,6 +1,7 @@
 #include <cs50.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 // Max number of candidates
 #define MAX 9
@@ -143,10 +144,58 @@ void add_pairs(void)
     return;
 }
 
+typedef int (*function_type_a)(pair);
+
+int strength(pair input) {
+    return preferences[input.winner][input.loser] - preferences[input.loser][input.winner];
+}
+
+void merge(pair old_array[], pair new_array[], int left_index_input, int right_index_input, int right_end, function_type_a callback_function) {
+    int left_index = left_index_input;
+    int right_index = right_index_input;
+    int new_array_index = left_index_input;
+    for (; new_array_index < right_end; ++new_array_index) {
+        (left_index < right_index_input && (right_index >= right_end || callback_function(old_array[left_index]) <= callback_function(old_array[right_index])))
+          ? (new_array[new_array_index] = old_array[left_index++])
+          : (new_array[new_array_index] = old_array[right_index++]);
+    }
+}
+
+int mininum(int const a, int const b) {
+    return (a > b)
+      ? b
+      : a;
+}
+
+void copy_array(pair old_array[], pair new_array[], int array_size) {
+    for (int index = 0; index < array_size; ++index) {
+        new_array[index] = old_array[index];
+    }
+}
+
+void merge_sort(pair input_array[], pair scratch_array[], int array_size) {
+    pair **input_array_address = &input_array;
+    pair **scratch_array_address = &scratch_array;
+    for (int sub_array_size = 1; sub_array_size < array_size; sub_array_size *= 2) {
+        for (int index = 0; index < array_size; index += 2 * sub_array_size) {
+            merge(*input_array_address, *scratch_array_address, index, mininum(index + sub_array_size, array_size), mininum(index + 2 * sub_array_size, array_size), (function_type_a)&strength);
+        }
+        // Swap arrays
+        (input_array_address == &input_array)
+          ? (input_array_address = &scratch_array, scratch_array_address = &input_array)
+          : (input_array_address = &input_array, scratch_array_address = &scratch_array);
+    }
+    // Copy scratch array contents to `input_array` if it was the last `new_array` used in the last merge (i.e., it contains the fully sorted array)
+    if ((int)ceil(log2(array_size)) % 2 != 0) {
+        copy_array(scratch_array, input_array, array_size);
+    }
+}
+
 // Sort pairs in decreasing order by strength of victory
 void sort_pairs(void)
 {
-    // TODO
+    pair pairs_temporary[MAX * (MAX - 1) / 2];
+    merge_sort(pairs, pairs_temporary, MAX * (MAX - 1) / 2);
     return;
 }
 
