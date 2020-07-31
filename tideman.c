@@ -205,11 +205,6 @@ void lock_pairs(void)
     locked[pairs[0].winner][pairs[0].loser] = true;
     for (int pairs_index_a = 1; pairs_index_a < pair_count; ++pairs_index_a) {
         locked[pairs[pairs_index_a].winner][pairs[pairs_index_a].loser] = true;
-        for (int pairs_index_b = 0; pairs_index_b < pairs_index_a; ++pairs_index_b) {
-            if (locked[pairs[pairs_index_b].winner][pairs[pairs_index_b].loser] && pairs[pairs_index_a].loser == pairs[pairs_index_b].winner) {
-                locked[pairs[pairs_index_a].winner][pairs[pairs_index_a].loser] = false;
-            }
-        }
     }
     return;
 }
