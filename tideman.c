@@ -167,12 +167,6 @@ int mininum(int const a, int const b) {
       : a;
 }
 
-void copy_array(pair old_array[], pair new_array[], int array_size) {
-    for (int index = 0; index < array_size; ++index) {
-        new_array[index] = old_array[index];
-    }
-}
-
 void merge_sort(pair input_array[], pair scratch_array[], int array_size) {
     pair **input_array_address = &input_array;
     pair **scratch_array_address = &scratch_array;
@@ -187,7 +181,7 @@ void merge_sort(pair input_array[], pair scratch_array[], int array_size) {
     }
     // Copy scratch array contents to `input_array` if it was the last `new_array` used in the last merge (i.e., it contains the fully sorted array)
     if ((int)ceil(log2(array_size)) % 2 != 0) {
-        copy_array(scratch_array, input_array, array_size);
+        memcpy(input_array, scratch_array, sizeof(pair) * array_size);
     }
 }
 
@@ -199,12 +193,51 @@ void sort_pairs(void)
     return;
 }
 
+void append_ancestor(int ancestors[], int ancestors_indices[], int const node, int const ancestor) {
+    ancestors[node][ancestors_indices[node]] = ancestor;
+    ++ancestors_indices[node];
+}
+
 // Lock pairs into the candidate graph in order, without creating cycles
 void lock_pairs(void)
 {
+    int ancestors[MAX][MAX] = { -1 };
+    int ancestors_indices[MAX] = { 0 };
+    int ancestors_buffer[MAX][MAX] = { -1 };
+    int ancestors_indices_buffer[MAX] = { 0 };
     locked[pairs[0].winner][pairs[0].loser] = true;
+    append_ancestor(ancestors, ancestors_indices, pairs[0].loser, pairs[0].winner);
+    // copy original to buffer
+    memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
+    memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
     for (int pairs_index_a = 1; pairs_index_a < pair_count; ++pairs_index_a) {
         locked[pairs[pairs_index_a].winner][pairs[pairs_index_a].loser] = true;
+        // winner is ancestor of loser and all its descendants
+        // for all members of ancestors array, check if they have loser as ancestor. if so, append winner as another ancestor if it isn't already included
+        for (int ancestors_candidate_index = 0; ancestors_candidate_index < MAX; ++ancestors_candidate_index) {
+            bool already_in_array = false;
+            bool should_break = false;
+            for (int ancestors_ancestor_index = 0; ancestors_ancestor_index < MAX; ++ancestors_ancestor_index) {
+                if (ancestors_buffer[ancestors_candidate_index][ancestors_ancestor_index] == ancestors_candidate_index) {
+                    // node is its own ancestor = cyclic, revert changes
+                    locked[pairs[pairs_index_a].winner][pairs[pairs_index_a].loser] = false;
+                    memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
+                    memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
+                    should_break = true;
+                    break;
+                } else if (ancestors_buffer[ancestors_candidate_index][ancestors_ancestor_index] == pairs[pairs_index_a].loser) {
+                    already_in_array = true;
+                }
+            }
+            if should_break {
+                break;
+            } else if !already_in_array {
+                append_ancestor(ancestors_buffer, ancestors_indices_buffer, ancestors[ancestors_candidate_index], pairs[0].winner);
+            }
+        }
+        // no cycle detected, apply changes
+        memcpy(ancestors, ancestors_buffer, sizeof(int) * MAX * MAX);
+        memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
     }
     return;
 }
