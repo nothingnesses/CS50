@@ -201,43 +201,51 @@ void append_ancestor(int ancestors[MAX][MAX], int ancestors_indices[], int const
 // Lock pairs into the candidate graph in order, without creating cycles
 void lock_pairs(void)
 {
-    int ancestors[MAX][MAX] = { {-1} };
+    int ancestors[MAX][MAX];
+    memset(ancestors, -1, sizeof(ancestors));
     int ancestors_indices[MAX] = { 0 };
-    int ancestors_buffer[MAX][MAX] = { {-1} };
+    int ancestors_buffer[MAX][MAX];
+    memset(ancestors_buffer, -1, sizeof(ancestors_buffer));
     int ancestors_indices_buffer[MAX] = { 0 };
     locked[pairs[0].winner][pairs[0].loser] = true;
     append_ancestor(ancestors, ancestors_indices, pairs[0].loser, pairs[0].winner);
     // copy original to buffer
     memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
     memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
-    for (int pairs_index_a = 1; pairs_index_a < pair_count; ++pairs_index_a) {
-        locked[pairs[pairs_index_a].winner][pairs[pairs_index_a].loser] = true;
+    for (int pairs_index = 1; pairs_index < pair_count; ++pairs_index) {
+        bool is_cyclic = false;
+        locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = true;
         // winner is ancestor of loser and all its descendants
         // for all members of ancestors array, check if they have loser as ancestor. if so, append winner as another ancestor if it isn't already included
         for (int ancestors_candidate_index = 0; ancestors_candidate_index < MAX; ++ancestors_candidate_index) {
-            bool already_in_array = false;
-            bool should_break = false;
+            bool loser_is_ancestor = false;
+            bool winner_is_already_in_ancestors_array = false;
+            is_cyclic = false;
             for (int ancestors_ancestor_index = 0; ancestors_ancestor_index < MAX; ++ancestors_ancestor_index) {
                 if (ancestors_buffer[ancestors_candidate_index][ancestors_ancestor_index] == ancestors_candidate_index) {
                     // node is its own ancestor = cyclic, revert changes
-                    locked[pairs[pairs_index_a].winner][pairs[pairs_index_a].loser] = false;
+                    locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
                     memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
                     memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
-                    should_break = true;
+                    is_cyclic = true;
                     break;
-                } else if (ancestors_buffer[ancestors_candidate_index][ancestors_ancestor_index] == pairs[pairs_index_a].loser) {
-                    already_in_array = true;
+                } else if (ancestors_buffer[ancestors_candidate_index][ancestors_ancestor_index] == pairs[pairs_index].loser) {
+                    loser_is_ancestor = true;
+                } else if (ancestors_buffer[ancestors_candidate_index][ancestors_ancestor_index] == pairs[pairs_index].winner) {
+                    winner_is_already_in_ancestors_array = true;
                 }
             }
-            if (should_break) {
+            if (is_cyclic) {
                 break;
-            } else if (!already_in_array) {
-                append_ancestor(ancestors_buffer, ancestors_indices_buffer, ancestors_candidate_index, pairs[0].winner);
+            } else if (loser_is_ancestor && !winner_is_already_in_ancestors_array) {
+                append_ancestor(ancestors_buffer, ancestors_indices_buffer, ancestors_candidate_index, pairs[pairs_index].winner);
             }
         }
-        // no cycle detected, apply changes
-        memcpy(ancestors, ancestors_buffer, sizeof(int) * MAX * MAX);
-        memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
+        if (!is_cyclic) {
+            // no cycle detected, apply changes
+            memcpy(ancestors, ancestors_buffer, sizeof(int) * MAX * MAX);
+            memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
+        }
     }
     return;
 }
