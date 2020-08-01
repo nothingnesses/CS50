@@ -26,6 +26,7 @@ pair pairs[MAX * (MAX - 1) / 2];
 
 int pair_count;
 int candidate_count;
+int winner_indices[MAX];
 
 // Function prototypes
 bool vote(int rank, string name, int ranks[]);
@@ -239,23 +240,30 @@ void lock_pairs(void)
             memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
         }
     }
+    // update winner_index
+    memset(winner_indices, -1, sizeof(winner_indices));
+    int winner_indices_index = 0;
+    winner_indices[winner_indices_index] = ancestors_indices[0];
+    for (int ancestors_indices_index = 0; ancestors_indices_index < candidate_count; ++ancestors_indices_index) {
+        if (ancestors_indices[ancestors_indices_index] < winner_indices[0]) {
+            // clear winners array, reset index to 0, append new winner to it
+            for (; winner_indices_index >= 0; --winner_indices_index) {
+                winner_indices[winner_indices_index] = -1;
+            }
+            winner_indices[++winner_indices_index] = ancestors_indices_index;
+        } else if (ancestors_indices[ancestors_indices_index] == winner_indices[winner_indices_index]) {
+            // append new winner
+            winner_indices[winner_indices_index] = ancestors_indices_index;
+        }
+    }
     return;
 }
 
 // Print the winner of the election
 void print_winner(void)
 {
-    int rank = 0;
-    for (int candidate_index_a = 0; candidate_index_a < candidate_count; ++candidate_index_a) {
-        rank = 0;
-        for (int candidate_index_b = 0; candidate_index_b < candidate_count; ++candidate_index_b) {
-            if (!locked[candidate_index_b][candidate_index_a]) {
-                ++rank;
-            }
-        }
-        if (rank == candidate_count) {
-            printf("%s\n", candidates[candidate_index_a]);
-        }
+    for (int winner_indices_index = 0; winner_indices[winner_indices_index] > -1; ++winner_indices_index) {
+        printf("%s\n", candidates[winner_indices[winner_indices_index]]);
     }
     return;
 }
