@@ -26,7 +26,7 @@ pair pairs[MAX * (MAX - 1) / 2];
 
 int pair_count;
 int candidate_count;
-int winner_indices[MAX];
+int winners_indices[MAX];
 
 // Function prototypes
 bool vote(int rank, string name, int ranks[]);
@@ -240,20 +240,13 @@ void lock_pairs(void)
             memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
         }
     }
-    // update winner_index
-    memset(winner_indices, -1, sizeof(winner_indices));
-    int winner_indices_index = 0;
-    winner_indices[winner_indices_index] = ancestors_indices[0];
+    // update winners_indices
+    memset(winners_indices, -1, sizeof(winners_indices));
+    int winners_indices_index = 0;
+    winners_indices[winners_indices_index] = ancestors_indices[0];
     for (int ancestors_indices_index = 0; ancestors_indices_index < candidate_count; ++ancestors_indices_index) {
-        if (ancestors_indices[ancestors_indices_index] < winner_indices[0]) {
-            // clear winners array, reset index to 0, append new winner to it
-            for (; winner_indices_index >= 0; --winner_indices_index) {
-                winner_indices[winner_indices_index] = -1;
-            }
-            winner_indices[++winner_indices_index] = ancestors_indices_index;
-        } else if (ancestors_indices[ancestors_indices_index] == winner_indices[winner_indices_index]) {
-            // append new winner
-            winner_indices[winner_indices_index] = ancestors_indices_index;
+        if (ancestors_indices[ancestors_indices_index] == 0) {
+            winners_indices[winners_indices_index++] = ancestors_indices_index;
         }
     }
     return;
@@ -262,8 +255,8 @@ void lock_pairs(void)
 // Print the winner of the election
 void print_winner(void)
 {
-    for (int winner_indices_index = 0; winner_indices[winner_indices_index] > -1; ++winner_indices_index) {
-        printf("%s\n", candidates[winner_indices[winner_indices_index]]);
+    for (int winner_indices_index = 0; winners_indices[winner_indices_index] > -1; ++winner_indices_index) {
+        printf("%s\n", candidates[winners_indices[winner_indices_index]]);
     }
     return;
 }
