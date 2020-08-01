@@ -207,36 +207,33 @@ void lock_pairs(void)
     int ancestors_buffer[MAX][MAX];
     memset(ancestors_buffer, -1, sizeof(ancestors_buffer));
     int ancestors_indices_buffer[MAX] = { 0 };
-    locked[pairs[0].winner][pairs[0].loser] = true;
-    append_ancestor(ancestors, ancestors_indices, pairs[0].loser, pairs[0].winner);
-    append_ancestor(ancestors_buffer, ancestors_indices_buffer, pairs[0].loser, pairs[0].winner);
-    for (int pairs_index = 1; pairs_index < pair_count; ++pairs_index) {
+    for (int pairs_index = 0; pairs_index < pair_count; ++pairs_index) {
         bool is_cyclic = false;
         locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = true;
         // winner is ancestor of loser and all its descendants
-        // for all members of ancestors array, check if they have loser as ancestor. if so, append winner as another ancestor if it isn't already included
-        for (int node_index = 0; node_index < MAX; ++node_index) {
+        // for all candidates, check if they have loser as ancestor or if they are loser. if so, append winner as another ancestor if it isn't already one
+        for (int candidate = 0; candidate < MAX; ++candidate) {
             bool loser_is_ancestor = false;
             bool winner_is_already_in_ancestors_array = false;
             is_cyclic = false;
             for (int ancestor_index = 0; ancestor_index < MAX; ++ancestor_index) {
-                if (ancestors_buffer[node_index][ancestor_index] == node_index) {
+                if (ancestors_buffer[candidate][ancestor_index] == candidate) {
                     // node is its own ancestor = cyclic, revert changes
                     locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
                     memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
                     memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
                     is_cyclic = true;
                     break;
-                } else if (ancestors_buffer[node_index][ancestor_index] == pairs[pairs_index].loser) {
+                } else if (ancestors_buffer[candidate][ancestor_index] == pairs[pairs_index].loser) {
                     loser_is_ancestor = true;
-                } else if (ancestors_buffer[node_index][ancestor_index] == pairs[pairs_index].winner) {
+                } else if (ancestors_buffer[candidate][ancestor_index] == pairs[pairs_index].winner) {
                     winner_is_already_in_ancestors_array = true;
                 }
             }
             if (is_cyclic) {
                 break;
-            } else if ((loser_is_ancestor || node_index == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
-                append_ancestor(ancestors_buffer, ancestors_indices_buffer, node_index, pairs[pairs_index].winner);
+            } else if ((loser_is_ancestor || candidate == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
+                append_ancestor(ancestors_buffer, ancestors_indices_buffer, candidate, pairs[pairs_index].winner);
             }
         }
         if (!is_cyclic) {
