@@ -245,7 +245,18 @@ void lock_pairs(void)
 // Print the winner of the election
 void print_winner(void)
 {
-    // TODO
+    int rank = 0;
+    for (int candidate_index_a = 0; candidate_index_a < candidate_count; ++candidate_index_a) {
+        rank = 0;
+        for (int candidate_index_b = 0; candidate_index_b < candidate_count; ++candidate_index_b) {
+            if (!locked[candidate_index_b][candidate_index_a]) {
+                ++rank;
+            }
+        }
+        if (rank == candidate_count) {
+            printf("%s\n", candidates[candidate_index_a]);
+        }
+    }
     return;
 }
 
