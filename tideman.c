@@ -193,11 +193,6 @@ void sort_pairs(void)
     return;
 }
 
-void append_ancestor(int ancestors[MAX][MAX], int ancestors_indices[], int const node, int const ancestor) {
-    ancestors[node][ancestors_indices[node]] = ancestor;
-    ++ancestors_indices[node];
-}
-
 // Lock pairs into the candidate graph in order, without creating cycles
 void lock_pairs(void)
 {
@@ -218,7 +213,7 @@ void lock_pairs(void)
             is_cyclic = false;
             for (int ancestor_index = 0; ancestor_index < MAX; ++ancestor_index) {
                 if (ancestors_buffer[candidate][ancestor_index] == candidate) {
-                    // node is its own ancestor = cyclic, revert changes
+                    // candidate is its own ancestor = cyclic, revert changes
                     locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
                     memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
                     memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
@@ -233,7 +228,9 @@ void lock_pairs(void)
             if (is_cyclic) {
                 break;
             } else if ((loser_is_ancestor || candidate == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
-                append_ancestor(ancestors_buffer, ancestors_indices_buffer, candidate, pairs[pairs_index].winner);
+                // append winner to ancestors_buffer array
+                ancestors_buffer[candidate][ancestors_indices_buffer[candidate]] = pairs[pairs_index].winner;
+                ++ancestors_indices_buffer[candidate];
             }
         }
         if (!is_cyclic) {
