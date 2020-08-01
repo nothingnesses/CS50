@@ -228,7 +228,7 @@ void lock_pairs(void)
             }
             if (is_cyclic) {
                 break;
-            } else if ((loser_is_ancestor || candidate == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
+            } else if ((loser_is_ancestor || pairs[pairs_index].winner == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
                 // append winner to ancestors_buffer array
                 ancestors_buffer[candidate][ancestors_indices_buffer[candidate]] = pairs[pairs_index].winner;
                 ++ancestors_indices_buffer[candidate];
