@@ -213,7 +213,7 @@ void lock_pairs(void)
             bool winner_is_already_in_ancestors_array = false;
             is_cyclic = false;
             for (int ancestor_index = 0; ancestor_index < MAX && ancestors_buffer[candidate][ancestor_index] > -1; ++ancestor_index) {
-                if (ancestors_buffer[candidate][ancestor_index] == candidate) {
+                if (ancestors_buffer[candidate][ancestor_index] == pairs[pair_count].winner) {
                     // candidate is its own ancestor = cyclic, revert changes
                     locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
                     memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
