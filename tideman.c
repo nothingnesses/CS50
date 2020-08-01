@@ -211,7 +211,7 @@ void lock_pairs(void)
             bool loser_is_ancestor = false;
             bool winner_is_already_in_ancestors_array = false;
             is_cyclic = false;
-            for (int ancestor_index = 0; ancestor_index < MAX; ++ancestor_index) {
+            for (int ancestor_index = 0; ancestor_index < MAX && ancestors_buffer[candidate][ancestor_index] > -1; ++ancestor_index) {
                 if (ancestors_buffer[candidate][ancestor_index] == candidate) {
                     // candidate is its own ancestor = cyclic, revert changes
                     locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
