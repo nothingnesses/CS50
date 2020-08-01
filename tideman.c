@@ -209,9 +209,7 @@ void lock_pairs(void)
     int ancestors_indices_buffer[MAX] = { 0 };
     locked[pairs[0].winner][pairs[0].loser] = true;
     append_ancestor(ancestors, ancestors_indices, pairs[0].loser, pairs[0].winner);
-    // copy original to buffer
-    memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
-    memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
+    append_ancestor(ancestors_buffer, ancestors_indices_buffer, pairs[0].loser, pairs[0].winner);
     for (int pairs_index = 1; pairs_index < pair_count; ++pairs_index) {
         bool is_cyclic = false;
         locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = true;
@@ -237,7 +235,7 @@ void lock_pairs(void)
             }
             if (is_cyclic) {
                 break;
-            } else if (loser_is_ancestor && !winner_is_already_in_ancestors_array) {
+            } else if ((loser_is_ancestor || node_index == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
                 append_ancestor(ancestors_buffer, ancestors_indices_buffer, node_index, pairs[pairs_index].winner);
             }
         }
