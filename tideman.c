@@ -197,59 +197,92 @@ void sort_pairs(void)
 // Lock pairs into the candidate graph in order, without creating cycles
 void lock_pairs(void)
 {
-    int ancestors[MAX][MAX];
-    memset(ancestors, -1, sizeof(ancestors));
-    int ancestors_indices[MAX] = { 0 };
-    int ancestors_buffer[MAX][MAX];
-    memset(ancestors_buffer, -1, sizeof(ancestors_buffer));
-    int ancestors_indices_buffer[MAX] = { 0 };
-    for (int pairs_index = 0; pairs_index < pair_count; ++pairs_index) {
-        bool is_cyclic = false;
-        locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = true;
-        // winner is ancestor of loser and all its descendants
-        // for all candidates, check if they have loser as ancestor or if they are loser. if so, append winner as another ancestor if it isn't already one
-        for (int candidate = 0; candidate < MAX; ++candidate) {
-            bool loser_is_ancestor = false;
-            bool winner_is_already_in_ancestors_array = false;
-            is_cyclic = false;
-            for (int ancestor_index = 0; ancestor_index < MAX && ancestors_buffer[candidate][ancestor_index] > -1; ++ancestor_index) {
-                if (ancestors_buffer[candidate][ancestor_index] == pairs[pairs_index].winner) {
-                    // candidate is its own ancestor = cyclic, revert changes
-                    locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
-                    memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
-                    memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
-                    is_cyclic = true;
-                    break;
-                } else if (ancestors_buffer[candidate][ancestor_index] == pairs[pairs_index].loser) {
-                    loser_is_ancestor = true;
-                } else if (ancestors_buffer[candidate][ancestor_index] == pairs[pairs_index].winner) {
-                    winner_is_already_in_ancestors_array = true;
-                }
+  int ancestors[MAX][MAX];
+  memset(ancestors, -1, sizeof(ancestors));
+  int ancestors_indices[MAX] = { 0 };
+  int ancestors_buffer[MAX][MAX];
+  memset(ancestors_buffer, -1, sizeof(ancestors_buffer));
+  int ancestors_indices_buffer[MAX] = { 0 };
+  for (int pairs_index = 0; pairs_index < pair_count; ++pairs_index) {
+    bool is_cyclic = false;
+    locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = true;
+    // winner and all its ancestors are ancestors of loser and all its descendants
+    // for all candidates, check if they have loser as ancestor or if they are loser. if so, append ancestors of winner, then also winner as ancestors of candidate if they aren't already added
+    // iterate through candidates
+    for (int candidate = 0; candidate < MAX; ++candidate) {
+      bool loser_is_ancestor = false;
+      bool winner_is_ancestor = false;
+      is_cyclic = false;
+      // iterate through candidate's ancestors to see if it has loser and winner as ancestors as long as we are encountering valid values (> -1)
+      for (int candidate_ancestors_index = 0; ancestors_buffer[candidate][candidate_ancestors_index] > -1; ++candidate_ancestors_index) {
+        if (ancestors_buffer[candidate][candidate_ancestors_index] == pairs[pairs_index].loser) {
+          loser_is_ancestor = true;
+        } else if (ancestors_buffer[candidate][candidate_ancestors_index] == pairs[pairs_index].winner) {
+          winner_is_ancestor = true;
+        }
+      }
+      // add ancestors of winner, then winner, as ancestors of candidate/loser if they aren't already added
+      if ((loser_is_ancestor || candidate == pairs[pairs_index].loser) && !winner_is_ancestor) {
+        // for safety, check if winner is candidate (meaning it's it's own parent), which shouldn't be possible and would indicate a cycle. if so, revert changes and bomb out
+        if (candidate == pairs[pairs_index].winner) {
+          locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
+          memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
+          memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
+          is_cyclic = true;
+          break;
+        } else {
+          // iterate through ancestors of winner as long as we are encountering valid values (> -1) and add them as ancestors of candidate if they aren't already and if they aren't candidate (which would mean we've created a cyclic graph and we should revert and skip pair)
+          for (int winner_ancestors_index = 0; winner_ancestors_index > -1; ++winner_ancestors_index) {
+            bool winner_ancestor_is_candidate_ancestor = false;
+            // iterate through candidate's ancestors to see if the winner's ancestor is already candidate's ancestor
+            for (int candidate_ancestors_index = 0; ancestors_buffer[candidate][candidate_ancestors_index] > -1; ++candidate_ancestors_index) {
+              if (ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index] == ancestors_buffer[candidate][candidate_ancestors_index]) {
+                // already an ancestor, break early
+                winner_ancestor_is_candidate_ancestor = true;
+                break;
+              } else if (ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index] == candidate) {
+                // candidate is its own ancestor = cyclic, revert changes and bomb out
+                locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
+                memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
+                memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
+                is_cyclic = true;
+                break;
+              }
             }
             if (is_cyclic) {
-                break;
-            } else if ((loser_is_ancestor || pairs[pairs_index].winner == pairs[pairs_index].loser) && !winner_is_already_in_ancestors_array) {
-                // append winner to ancestors_buffer array
-                ancestors_buffer[candidate][ancestors_indices_buffer[candidate]] = pairs[pairs_index].winner;
-                ++ancestors_indices_buffer[candidate];
+              break;
+            } else if (!winner_ancestor_is_candidate_ancestor) {
+              // append ancestor, increment ancestor index
+              ancestors_buffer[candidate][++ancestors_indices_buffer[candidate]] = ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index];
             }
+          }
+          if (is_cyclic) {
+            break;
+          } else {
+            // finally, add winner as ancestor as well, increment ancestor index
+            ancestors_buffer[candidate][++ancestors_indices_buffer[candidate]] = pairs[pairs_index].winner;
+          }
         }
-        if (!is_cyclic) {
-            // no cycle detected, apply changes
-            memcpy(ancestors, ancestors_buffer, sizeof(int) * MAX * MAX);
-            memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
-        }
+      }
+      if (is_cyclic) {
+        break;
+      } else {
+        // no cycle detected, apply changes
+        memcpy(ancestors, ancestors_buffer, sizeof(int) * MAX * MAX);
+        memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
+      }
     }
-    // update winners_indices
-    memset(winners_indices, -1, sizeof(winners_indices));
-    int winners_indices_index = 0;
-    winners_indices[winners_indices_index] = ancestors_indices[0];
-    for (int ancestors_indices_index = 0; ancestors_indices_index < candidate_count; ++ancestors_indices_index) {
-        if (ancestors_indices[ancestors_indices_index] == 0) {
-            winners_indices[winners_indices_index++] = ancestors_indices_index;
-        }
-    }
-    return;
+  }
+  // update winners_indices
+  memset(winners_indices, -1, sizeof(winners_indices));
+  int winners_indices_index = 0;
+  for (int ancestors_indices_index = 0; ancestors_indices_index < candidate_count; ++ancestors_indices_index) {
+      if (ancestors_indices[ancestors_indices_index] == 0) {
+          // this candidate has no ancestors = it's a winner
+          winners_indices[winners_indices_index++] = ancestors_indices_index;
+      }
+  }
+  return;
 }
 
 // Print the winner of the election
