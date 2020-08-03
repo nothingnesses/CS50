@@ -26,7 +26,6 @@ pair pairs[MAX * (MAX - 1) / 2];
 
 int pair_count;
 int candidate_count;
-int winners_indices[MAX];
 
 // Function prototypes
 bool vote(int rank, string name, int ranks[]);
@@ -102,96 +101,96 @@ int main(int argc, string argv[])
 // Update ranks given a new vote
 bool vote(int rank, string name, int ranks[])
 {
-    for (int candidates_index = 0; candidates_index < candidate_count; ++candidates_index)
-    {
-        if (strcmp(candidates[candidates_index], name) == 0) {
-            ranks[rank] = candidates_index;
-            return true;
-        }
+  for (int candidates_index = 0; candidates_index < candidate_count; ++candidates_index)
+  {
+    if (strcmp(candidates[candidates_index], name) == 0) {
+      ranks[rank] = candidates_index;
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 // Update preferences given one voter's ranks
 void record_preferences(int ranks[])
 {
-    for (int ranks_index_a = 1; ranks_index_a < candidate_count; ++ranks_index_a) {
-        for (int ranks_index_b = ranks_index_a - 1; ranks_index_b >= 0; --ranks_index_b) {
-            ++preferences[ranks[ranks_index_b]][ranks[ranks_index_a]];
-        }
+  for (int ranks_index_a = 1; ranks_index_a < candidate_count; ++ranks_index_a) {
+    for (int ranks_index_b = ranks_index_a - 1; ranks_index_b >= 0; --ranks_index_b) {
+      ++preferences[ranks[ranks_index_b]][ranks[ranks_index_a]];
     }
-    return;
+  }
+  return;
 }
 
 // Record pairs of candidates where one is preferred over the other
 void add_pairs(void)
 {
-    for (int preferences_index_a = 0; preferences_index_a < MAX; ++preferences_index_a) {
-        for (int preferences_index_b = preferences_index_a - 1; preferences_index_b >= 0; --preferences_index_b) {
-            if (preferences[preferences_index_a][preferences_index_b] != preferences[preferences_index_b][preferences_index_a]) {
-                (preferences[preferences_index_a][preferences_index_b] > preferences[preferences_index_b][preferences_index_a])
-                    ? (pairs[pair_count] = (pair){
-                        preferences_index_a,
-                        preferences_index_b
-                    })
-                    : (pairs[pair_count] = (pair){
-                        preferences_index_b,
-                        preferences_index_a
-                    });
-                ++pair_count;
-            }
-        }
+  for (int preferences_index_a = 0; preferences_index_a < MAX; ++preferences_index_a) {
+    for (int preferences_index_b = preferences_index_a - 1; preferences_index_b >= 0; --preferences_index_b) {
+      if (preferences[preferences_index_a][preferences_index_b] != preferences[preferences_index_b][preferences_index_a]) {
+        (preferences[preferences_index_a][preferences_index_b] > preferences[preferences_index_b][preferences_index_a])
+          ? (pairs[pair_count] = (pair){
+            preferences_index_a,
+            preferences_index_b
+          })
+          : (pairs[pair_count] = (pair){
+            preferences_index_b,
+            preferences_index_a
+          });
+        ++pair_count;
+      }
     }
-    return;
+  }
+  return;
 }
 
 typedef int (*function_type_a)(pair);
 
 int strength(pair input) {
-    return preferences[input.loser][input.winner] - preferences[input.winner][input.loser];
+  return preferences[input.loser][input.winner] - preferences[input.winner][input.loser];
 }
 
 void merge(pair old_array[], pair new_array[], int left_index_input, int right_index_input, int right_end, function_type_a callback_function) {
-    int left_index = left_index_input;
-    int right_index = right_index_input;
-    int new_array_index = left_index_input;
-    for (; new_array_index < right_end; ++new_array_index) {
-        (left_index < right_index_input && (right_index >= right_end || callback_function(old_array[left_index]) <= callback_function(old_array[right_index])))
-          ? (new_array[new_array_index] = old_array[left_index++])
-          : (new_array[new_array_index] = old_array[right_index++]);
-    }
+  int left_index = left_index_input;
+  int right_index = right_index_input;
+  int new_array_index = left_index_input;
+  for (; new_array_index < right_end; ++new_array_index) {
+    (left_index < right_index_input && (right_index >= right_end || callback_function(old_array[left_index]) <= callback_function(old_array[right_index])))
+      ? (new_array[new_array_index] = old_array[left_index++])
+      : (new_array[new_array_index] = old_array[right_index++]);
+  }
 }
 
 int mininum(int const a, int const b) {
-    return (a > b)
-      ? b
-      : a;
+  return (a > b)
+    ? b
+    : a;
 }
 
 void merge_sort(pair input_array[], pair scratch_array[], int array_size) {
-    pair **input_array_address = &input_array;
-    pair **scratch_array_address = &scratch_array;
-    for (int sub_array_size = 1; sub_array_size < array_size; sub_array_size *= 2) {
-        for (int index = 0; index < array_size; index += 2 * sub_array_size) {
-            merge(*input_array_address, *scratch_array_address, index, mininum(index + sub_array_size, array_size), mininum(index + 2 * sub_array_size, array_size), (function_type_a)&strength);
-        }
-        // Swap where the array pointers are pointing to
-        (input_array_address == &input_array)
-          ? (input_array_address = &scratch_array, scratch_array_address = &input_array)
-          : (input_array_address = &input_array, scratch_array_address = &scratch_array);
+  pair **input_array_address = &input_array;
+  pair **scratch_array_address = &scratch_array;
+  for (int sub_array_size = 1; sub_array_size < array_size; sub_array_size *= 2) {
+    for (int index = 0; index < array_size; index += 2 * sub_array_size) {
+      merge(*input_array_address, *scratch_array_address, index, mininum(index + sub_array_size, array_size), mininum(index + 2 * sub_array_size, array_size), (function_type_a)&strength);
     }
-    // Copy scratch array contents to `input_array` if it was the last `new_array` used in the last merge (i.e., it contains the fully sorted array)
-    if ((int)ceil(log2(array_size)) % 2 != 0) {
-        memcpy(input_array, scratch_array, sizeof(pair) * array_size);
-    }
+    // Swap where the array pointers are pointing to
+    (input_array_address == &input_array)
+      ? (input_array_address = &scratch_array, scratch_array_address = &input_array)
+      : (input_array_address = &input_array, scratch_array_address = &scratch_array);
+  }
+  // Copy scratch array contents to `input_array` if it was the last `new_array` used in the last merge (i.e., it contains the fully sorted array)
+  if ((int)ceil(log2(array_size)) % 2 != 0) {
+    memcpy(input_array, scratch_array, sizeof(pair) * array_size);
+  }
 }
 
 // Sort pairs in decreasing order by strength of victory
 void sort_pairs(void)
 {
-    pair pairs_temporary[MAX * (MAX - 1) / 2];
-    merge_sort(pairs, pairs_temporary, MAX * (MAX - 1) / 2);
-    return;
+  pair pairs_temporary[MAX * (MAX - 1) / 2];
+  merge_sort(pairs, pairs_temporary, MAX * (MAX - 1) / 2);
+  return;
 }
 
 // Lock pairs into the candidate graph in order, without creating cycles
@@ -206,14 +205,14 @@ void lock_pairs(void)
   for (int pairs_index = 0; pairs_index < pair_count; ++pairs_index) {
     bool is_cyclic = false;
     locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = true;
-    // winner and all its ancestors are ancestors of loser and all its descendants
-    // for all candidates, check if they have loser as ancestor or if they are loser. if so, append ancestors of winner, then also winner as ancestors of candidate if they aren't already added
-    // iterate through candidates
+    // Winner and all its ancestors are ancestors of loser and all its descendants
+    // For all candidates, check if they have loser as ancestor or if they are loser. If so, append ancestors of winner, then also winner as ancestors of candidate if they aren't already added
+    // Iterate through candidates
     for (int candidate = 0; candidate < MAX; ++candidate) {
       bool loser_is_ancestor = false;
       bool winner_is_ancestor = false;
       is_cyclic = false;
-      // iterate through candidate's ancestors to see if it has loser and winner as ancestors as long as we are encountering valid values (> -1)
+      // Iterate through candidate's ancestors to see if it has loser and winner as ancestors as long as we are encountering valid values (> -1)
       for (int candidate_ancestors_index = 0; ancestors_buffer[candidate][candidate_ancestors_index] > -1; ++candidate_ancestors_index) {
         if (ancestors_buffer[candidate][candidate_ancestors_index] == pairs[pairs_index].loser) {
           loser_is_ancestor = true;
@@ -221,9 +220,9 @@ void lock_pairs(void)
           winner_is_ancestor = true;
         }
       }
-      // add ancestors of winner, then winner, as ancestors of candidate/loser if they aren't already added
+      // Add ancestors of winner, then winner, as ancestors of candidate/loser if they aren't already added
       if ((loser_is_ancestor || candidate == pairs[pairs_index].loser) && !winner_is_ancestor) {
-        // for safety, check if winner is candidate (meaning it's it's own parent), which shouldn't be possible and would indicate a cycle. if so, revert changes and bomb out
+        // For safety, check if winner is candidate (meaning it's it's own parent), which shouldn't be possible and would indicate a cycle. if so, revert changes and bomb out
         if (candidate == pairs[pairs_index].winner) {
           locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
           memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
@@ -231,17 +230,17 @@ void lock_pairs(void)
           is_cyclic = true;
           break;
         } else {
-          // iterate through ancestors of winner as long as we are encountering valid values (> -1) and add them as ancestors of candidate if they aren't already and if they aren't candidate (which would mean we've created a cyclic graph and we should revert and skip pair)
+          // Iterate through ancestors of winner as long as we are encountering valid values (> -1) and add them as ancestors of candidate if they aren't already and if they aren't candidate (which would mean we've created a cyclic graph and we should revert and skip pair)
           for (int winner_ancestors_index = 0; ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index] > -1; ++winner_ancestors_index) {
             bool winner_ancestor_is_candidate_ancestor = false;
-            // iterate through candidate's ancestors to see if the winner's ancestor is already candidate's ancestor
+            // Iterate through candidate's ancestors to see if the winner's ancestor is already candidate's ancestor
             for (int candidate_ancestors_index = 0; ancestors_buffer[candidate][candidate_ancestors_index] > -1; ++candidate_ancestors_index) {
               if (ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index] == ancestors_buffer[candidate][candidate_ancestors_index]) {
-                // already an ancestor, break early
+                // Already an ancestor, break early
                 winner_ancestor_is_candidate_ancestor = true;
                 break;
               } else if (ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index] == candidate) {
-                // candidate is its own ancestor = cyclic, revert changes and bomb out
+                // Candidate is its own ancestor = cyclic, revert changes and bomb out
                 locked[pairs[pairs_index].winner][pairs[pairs_index].loser] = false;
                 memcpy(ancestors_buffer, ancestors, sizeof(int) * MAX * MAX);
                 memcpy(ancestors_indices_buffer, ancestors_indices, sizeof(int) * MAX);
@@ -252,14 +251,14 @@ void lock_pairs(void)
             if (is_cyclic) {
               break;
             } else if (!winner_ancestor_is_candidate_ancestor) {
-              // append ancestor, increment ancestor index
+              // Append ancestor, increment ancestor index
               ancestors_buffer[candidate][ancestors_indices_buffer[candidate]++] = ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index];
             }
           }
           if (is_cyclic) {
             break;
           } else {
-            // finally, add winner as ancestor as well, increment ancestor index
+            // Finally, add winner as ancestor as well, increment ancestor index
             ancestors_buffer[candidate][ancestors_indices_buffer[candidate]++] = pairs[pairs_index].winner;
           }
         }
@@ -267,20 +266,11 @@ void lock_pairs(void)
       if (is_cyclic) {
         break;
       } else {
-        // no cycle detected, apply changes
+        // No cycle detected, apply changes
         memcpy(ancestors, ancestors_buffer, sizeof(int) * MAX * MAX);
         memcpy(ancestors_indices, ancestors_indices_buffer, sizeof(int) * MAX);
       }
     }
-  }
-  // update winners_indices
-  memset(winners_indices, -1, sizeof(winners_indices));
-  int winners_indices_index = 0;
-  for (int ancestors_indices_index = 0; ancestors_indices_index < candidate_count; ++ancestors_indices_index) {
-      if (ancestors_indices[ancestors_indices_index] == 0) {
-          // this candidate has no ancestors = it's a winner
-          winners_indices[winners_indices_index++] = ancestors_indices_index;
-      }
   }
   return;
 }
@@ -288,9 +278,18 @@ void lock_pairs(void)
 // Print the winner of the election
 void print_winner(void)
 {
-    for (int winner_indices_index = 0; winners_indices[winner_indices_index] > -1; ++winner_indices_index) {
-        printf("%s\n", candidates[winners_indices[winner_indices_index]]);
+  int rank = 0;
+  for (int candidate_index_a = 0; candidate_index_a < candidate_count; ++candidate_index_a) {
+    rank = 0;
+    for (int candidate_index_b = 0; candidate_index_b < candidate_count; ++candidate_index_b) {
+      if (!locked[candidate_index_b][candidate_index_a]) {
+        ++rank;
+      }
     }
-    return;
+    if (rank == candidate_count) {
+      printf("%s\n", candidates[candidate_index_a]);
+    }
+  }
+  return;
 }
 
