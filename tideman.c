@@ -253,14 +253,16 @@ void lock_pairs(void)
               break;
             } else if (!winner_ancestor_is_candidate_ancestor) {
               // append ancestor, increment ancestor index
-              ancestors_buffer[candidate][++ancestors_indices_buffer[candidate]] = ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index];
+              ancestors_buffer[candidate][ancestors_indices_buffer[candidate]] = ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index];
+              ++ancestors_indices_buffer[candidate];
             }
           }
           if (is_cyclic) {
             break;
           } else {
             // finally, add winner as ancestor as well, increment ancestor index
-            ancestors_buffer[candidate][++ancestors_indices_buffer[candidate]] = pairs[pairs_index].winner;
+            ancestors_buffer[candidate][ancestors_indices_buffer[candidate]] = pairs[pairs_index].winner;
+            ++ancestors_indices_buffer[candidate];
           }
         }
       }
