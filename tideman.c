@@ -232,7 +232,7 @@ void lock_pairs(void)
           break;
         } else {
           // iterate through ancestors of winner as long as we are encountering valid values (> -1) and add them as ancestors of candidate if they aren't already and if they aren't candidate (which would mean we've created a cyclic graph and we should revert and skip pair)
-          for (int winner_ancestors_index = 0; winner_ancestors_index > -1; ++winner_ancestors_index) {
+          for (int winner_ancestors_index = 0; ancestors_buffer[pairs[pairs_index].winner][winner_ancestors_index] > -1; ++winner_ancestors_index) {
             bool winner_ancestor_is_candidate_ancestor = false;
             // iterate through candidate's ancestors to see if the winner's ancestor is already candidate's ancestor
             for (int candidate_ancestors_index = 0; ancestors_buffer[candidate][candidate_ancestors_index] > -1; ++candidate_ancestors_index) {
