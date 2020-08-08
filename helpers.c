@@ -4,7 +4,7 @@
 
 // Convert pixel to greyscale
 void pixel_greyscale(RGBTRIPLE *pixel) {
-    BYTE colour = (BYTE)(round((float)((pixel->rgbtBlue + pixel->rgbtGreen + pixel->rgbtRed) / 3)));
+    BYTE colour = (BYTE)(round((((float)pixel->rgbtBlue + (float)pixel->rgbtGreen + (float)pixel->rgbtRed) / 3)));
     *pixel = (RGBTRIPLE){
         colour,
         colour,
