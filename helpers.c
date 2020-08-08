@@ -93,21 +93,21 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             ++pixels;
         }
         // bottom left exists
-        if (row < height && column >= 1) {
+        if (row < height - 1 && column >= 1) {
             pixel.red += (int)scratch_image[row + 1][column - 1].rgbtRed;
             pixel.green += (int)scratch_image[row + 1][column - 1].rgbtGreen;
             pixel.blue += (int)scratch_image[row + 1][column - 1].rgbtBlue;
             ++pixels;
         }
         // bottom exists
-        if (row < height) {
+        if (row < height - 1) {
             pixel.red += (int)scratch_image[row + 1][column].rgbtRed;
             pixel.green += (int)scratch_image[row + 1][column].rgbtGreen;
             pixel.blue += (int)scratch_image[row + 1][column].rgbtBlue;
             ++pixels;
         }
         // bottom right exists
-        if (row < height && column < width - 1) {
+        if (row < height - 1 && column < width - 1) {
             pixel.red += (int)scratch_image[row + 1][column + 1].rgbtRed;
             pixel.green += (int)scratch_image[row + 1][column + 1].rgbtGreen;
             pixel.blue += (int)scratch_image[row + 1][column + 1].rgbtBlue;
@@ -183,7 +183,7 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
             Gx.blue += (int)scratch_image[row][column + 1].rgbtBlue * 2;
         }
         // bottom left exists
-        if (row < height && column >= 1) {
+        if (row < height - 1 && column >= 1) {
             Gx.red += (int)scratch_image[row + 1][column - 1].rgbtRed * -1;
             Gx.green += (int)scratch_image[row + 1][column - 1].rgbtGreen * -1;
             Gx.blue += (int)scratch_image[row + 1][column - 1].rgbtBlue * -1;
@@ -192,13 +192,13 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
             Gy.blue += (int)scratch_image[row + 1][column - 1].rgbtBlue;
         }
         // bottom exists
-        if (row < height) {
+        if (row < height - 1) {
             Gy.red += (int)scratch_image[row + 1][column].rgbtRed * 2;
             Gy.green += (int)scratch_image[row + 1][column].rgbtGreen * 2;
             Gy.blue += (int)scratch_image[row + 1][column].rgbtBlue * 2;
         }
         // bottom right exists
-        if (row < height && column < width - 1) {
+        if (row < height - 1 && column < width - 1) {
             Gx.red += (int)scratch_image[row + 1][column + 1].rgbtRed;
             Gx.green += (int)scratch_image[row + 1][column + 1].rgbtGreen;
             Gx.blue += (int)scratch_image[row + 1][column + 1].rgbtBlue;
