@@ -15,7 +15,6 @@ void pixel_greyscale(RGBTRIPLE *pixel) {
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
-  --height, --width;
     for (int row = 0; row < height; ++row) {
         for (int column = 0; column < width; ++column) {
             pixel_greyscale(&image[row][column]);
@@ -29,7 +28,6 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
   RGBTRIPLE scratch_image[height][width];
   memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
-  --height, --width;
   for (int row = 0; row < height; ++row) {
     int image_column = 0;
     int scratch_image_column = width;
@@ -51,7 +49,6 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE scratch_image[height][width];
     memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
-  --height, --width;
   for (int row = 0; row < height; ++row) {
     for (int column = 0; column < width; ++column) {
         int pixels = 1;
@@ -137,7 +134,6 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE scratch_image[height + 2][width];
     memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
-  --height, --width;
   for (int row = 0; row < height; ++row) {
     for (int column = 0; column < width; ++column) {
         RGB Gx = (RGB){
