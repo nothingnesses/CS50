@@ -30,7 +30,7 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
   memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
   for (int row = 0; row < height; ++row) {
     int image_column = 0;
-    int scratch_image_column = width;
+    int scratch_image_column = width - 1;
     for (; image_column < width;) {
       image[row][image_column++] = scratch_image[row][scratch_image_column--];
     }
