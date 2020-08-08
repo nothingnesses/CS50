@@ -15,6 +15,7 @@ void pixel_greyscale(RGBTRIPLE *pixel) {
 // Convert image to grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
+  --height, --width;
     for (int row = 0; row < height; ++row) {
         for (int column = 0; column < width; ++column) {
             pixel_greyscale(&image[row][column]);
@@ -26,17 +27,17 @@ void grayscale(int height, int width, RGBTRIPLE image[height][width])
 // Reflect image horizontally
 void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
-    RGBTRIPLE scratch_image[height][width];
-    memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
-    // Iterate through rows
+  RGBTRIPLE scratch_image[height][width];
+  memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
+  --height, --width;
   for (int row = 0; row < height; ++row) {
     int image_column = 0;
     int scratch_image_column = width;
-    for (; scratch_image_column >= 0; --scratch_image_column, ++image_column) {
-        image[row][image_column] = scratch_image[row][scratch_image_column];
+    for (; image_column < width;) {
+      image[row][image_column++] = scratch_image[row][scratch_image_column--];
     }
   }
-    return;
+  return;
 }
 
 typedef struct RGB {
@@ -50,6 +51,7 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE scratch_image[height][width];
     memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
+  --height, --width;
   for (int row = 0; row < height; ++row) {
     for (int column = 0; column < width; ++column) {
         int pixels = 1;
@@ -135,6 +137,7 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE scratch_image[height + 2][width];
     memcpy(scratch_image, image, sizeof(RGBTRIPLE) * height * width);
+  --height, --width;
   for (int row = 0; row < height; ++row) {
     for (int column = 0; column < width; ++column) {
         RGB Gx = (RGB){
