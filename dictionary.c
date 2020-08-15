@@ -37,8 +37,10 @@ char *dictionary_pointer = NULL;
 struct stat stat_buffer;
 
 // Converts a string to lowercase
-void lowercase(char *input, char *buffer, int input_length) {
-    for (int word_index = 0; word_index < input_length; ++word_index) {
+void lowercase(char *input, char *buffer, int input_length)
+{
+    for (int word_index = 0; word_index < input_length; ++word_index)
+    {
         buffer[word_index] = tolower(input[word_index]);
     }
     buffer[input_length] = '\0';
@@ -135,9 +137,9 @@ static uint32_t XXH_read32(uint8_t const *const p)
     return ret;
 #else
     return (uint32_t)p[0]
-        | ((uint32_t)p[1] << 8)
-        | ((uint32_t)p[2] << 16)
-        | ((uint32_t)p[3] << 24);
+           | ((uint32_t)p[1] << 8)
+           | ((uint32_t)p[2] << 16)
+           | ((uint32_t)p[3] << 24);
 #endif
 }
 
@@ -150,13 +152,13 @@ static uint64_t XXH_read64(uint8_t const *const p)
     return ret;
 #else
     return (uint64_t)p[0]
-        | ((uint64_t)p[1] << 8)
-        | ((uint64_t)p[2] << 16)
-        | ((uint64_t)p[3] << 24)
-        | ((uint64_t)p[4] << 32)
-        | ((uint64_t)p[5] << 40)
-        | ((uint64_t)p[6] << 48)
-        | ((uint64_t)p[7] << 56);
+           | ((uint64_t)p[1] << 8)
+           | ((uint64_t)p[2] << 16)
+           | ((uint64_t)p[3] << 24)
+           | ((uint64_t)p[4] << 32)
+           | ((uint64_t)p[5] << 40)
+           | ((uint64_t)p[6] << 48)
+           | ((uint64_t)p[7] << 56);
 #endif
 }
 
@@ -181,22 +183,22 @@ static void XXH_write64(uint8_t *const p, uint64_t val)
 static uint32_t XXH_swap32(uint32_t const x)
 {
     return ((x << 24) & 0xff000000)
-         | ((x <<  8) & 0x00ff0000)
-         | ((x >>  8) & 0x0000ff00)
-         | ((x >> 24) & 0x000000ff);
+           | ((x <<  8) & 0x00ff0000)
+           | ((x >>  8) & 0x0000ff00)
+           | ((x >> 24) & 0x000000ff);
 }
 
 /* 32-bit byteswap */
 static uint64_t XXH_swap64(uint64_t const x)
 {
     return ((x << 56) & 0xff00000000000000ULL)
-         | ((x << 40) & 0x00ff000000000000ULL)
-         | ((x << 24) & 0x0000ff0000000000ULL)
-         | ((x << 8)  & 0x000000ff00000000ULL)
-         | ((x >> 8)  & 0x00000000ff000000ULL)
-         | ((x >> 24) & 0x0000000000ff0000ULL)
-         | ((x >> 40) & 0x000000000000ff00ULL)
-         | ((x >> 56) & 0x00000000000000ffULL);
+           | ((x << 40) & 0x00ff000000000000ULL)
+           | ((x << 24) & 0x0000ff0000000000ULL)
+           | ((x << 8)  & 0x000000ff00000000ULL)
+           | ((x >> 8)  & 0x00000000ff000000ULL)
+           | ((x >> 24) & 0x0000000000ff0000ULL)
+           | ((x >> 40) & 0x000000000000ff00ULL)
+           | ((x >> 56) & 0x00000000000000ffULL);
 }
 
 /* 64-bit rotate left */
@@ -208,7 +210,8 @@ static uint64_t XXH_rotl64(uint64_t const val, unsigned const amt)
 #define XXH_SECRET_DEFAULT_SIZE 192   /* minimum XXH3_SECRET_SIZE_MIN */
 
 /* Pseudorandom data taken directly from FARSH */
-static uint8_t const kSecret[XXH_SECRET_DEFAULT_SIZE] = {
+static uint8_t const kSecret[XXH_SECRET_DEFAULT_SIZE] =
+{
     0xb8, 0xfe, 0x6c, 0x39, 0x23, 0xa4, 0x4b, 0xbe, 0x7c, 0x01, 0x81, 0x2c, 0xf7, 0x21, 0xad, 0x1c,
     0xde, 0xd4, 0x6d, 0xe9, 0x83, 0x90, 0x97, 0xdb, 0x72, 0x40, 0xa4, 0xa4, 0xb7, 0xb3, 0x67, 0x1f,
     0xcb, 0x79, 0xe6, 0x4e, 0xcc, 0xc0, 0xe5, 0x78, 0x82, 0x5a, 0xd0, 0x7d, 0xcc, 0xff, 0x72, 0x21,
@@ -230,7 +233,7 @@ static uint64_t XXH3_mul128_fold64(uint64_t const lhs, uint64_t const rhs)
 {
 #if defined(__SIZEOF_INT128__) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 128)
     __uint128_t product = (__uint128_t) lhs * (__uint128_t) rhs;
-    return (uint64_t) (product & 0xFFFFFFFFFFFFFFFFULL) ^ (uint64_t) (product >> 64);
+    return (uint64_t)(product & 0xFFFFFFFFFFFFFFFFULL) ^ (uint64_t)(product >> 64);
 
     /* There are other platform-specific versions in the official repo.
      * They would all be left out in favor of the code above, but it is not
@@ -290,9 +293,9 @@ static XXH64_hash_t XXH3_len_1to3_64b(uint8_t const *const input,
     uint8_t  const byte3 = input[length - 1];
 
     uint32_t const combined = ((uint32_t)byte1  << 16)
-                            | ((uint32_t)byte2  << 24)
-                            | ((uint32_t)byte3  <<  0)
-                            | ((uint32_t)length <<  8);
+                              | ((uint32_t)byte2  << 24)
+                              | ((uint32_t)byte3  <<  0)
+                              | ((uint32_t)length <<  8);
     uint64_t acc = (uint64_t)(XXH_read32(secret) ^ XXH_read32(secret + 4));
     acc += seed;
     acc ^= (uint64_t)combined;
@@ -328,8 +331,8 @@ static XXH64_hash_t XXH3_len_9to16_64b(uint8_t const *const input,
                                        uint8_t const *const secret,
                                        XXH64_hash_t const seed)
 {
-    uint64_t input_lo = XXH_read64(secret+24) ^ XXH_read64(secret+32);
-    uint64_t input_hi = XXH_read64(secret+40) ^ XXH_read64(secret+48);
+    uint64_t input_lo = XXH_read64(secret + 24) ^ XXH_read64(secret + 32);
+    uint64_t input_hi = XXH_read64(secret + 40) ^ XXH_read64(secret + 48);
     uint64_t acc      = (uint64_t)length;
     input_lo += seed;
     input_hi -= seed;
@@ -348,11 +351,17 @@ static XXH64_hash_t XXH3_len_0to16_64b(uint8_t const *const input,
                                        XXH64_hash_t const seed)
 {
     if (length > 8)
+    {
         return XXH3_len_9to16_64b(input, length, secret, seed);
+    }
     else if (length >= 4)
+    {
         return XXH3_len_4to8_64b(input, length, secret, seed);
+    }
     else if (length != 0)
+    {
         return XXH3_len_1to3_64b(input, length, secret, seed);
+    }
     return XXH3_len_0_64b(secret, seed);
 }
 
@@ -372,15 +381,16 @@ static uint64_t XXH3_mix16B(uint8_t const *const input,
 
 /* Hashes midsize keys from 17 to 128 bytes */
 static XXH64_hash_t XXH3_len_17to128_64b(uint8_t const *const input,
-                                         size_t const length,
-                                         uint8_t const *const secret,
-                                         XXH64_hash_t const seed)
+        size_t const length,
+        uint8_t const *const secret,
+        XXH64_hash_t const seed)
 {
     int i = (int)((length - 1) / 32);
 
     uint64_t acc = length * PRIME64_1;
 
-    for (; i >= 0; i--) {
+    for (; i >= 0; i--)
+    {
         acc += XXH3_mix16B(input + (16 * i),                secret + (32 * i),      seed);
         acc += XXH3_mix16B(input + length - (16 * (i + 1)), secret + (32 * i) + 16, seed);
     }
@@ -391,33 +401,35 @@ static XXH64_hash_t XXH3_len_17to128_64b(uint8_t const *const input,
 
 /* Hashes midsize keys from 129 to 240 bytes */
 static XXH64_hash_t XXH3_len_129to240_64b(uint8_t const *const input,
-                                          size_t const length,
-                                          uint8_t const *const secret,
-                                          XXH64_hash_t const seed)
+        size_t const length,
+        uint8_t const *const secret,
+        XXH64_hash_t const seed)
 {
 
-    #define XXH3_MIDSIZE_STARTOFFSET 3
-    #define XXH3_MIDSIZE_LASTOFFSET  17
+#define XXH3_MIDSIZE_STARTOFFSET 3
+#define XXH3_MIDSIZE_LASTOFFSET  17
 
     uint64_t acc = (uint64_t)length * PRIME64_1;
     int const nbRounds = (int)length / 16;
     int i;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++)
+    {
         acc += XXH3_mix16B(input + (16 * i), secret + (16 * i), seed);
     }
 
     acc = XXH3_avalanche(acc);
 
-    for (i = 8; i < nbRounds; i++) {
+    for (i = 8; i < nbRounds; i++)
+    {
         acc += XXH3_mix16B(input  + (16 * i),
                            secret + (16 * (i - 8))
-                                  + XXH3_MIDSIZE_STARTOFFSET,
+                           + XXH3_MIDSIZE_STARTOFFSET,
                            seed);
     }
     /* last bytes */
     acc += XXH3_mix16B(input + length - 16,
                        secret + XXH3_SECRET_SIZE_MIN
-                              - XXH3_MIDSIZE_LASTOFFSET,
+                       - XXH3_MIDSIZE_LASTOFFSET,
                        seed);
     return XXH3_avalanche(acc);
 }
@@ -429,9 +441,13 @@ static XXH64_hash_t XXH3_hashShort_64b(uint8_t const *const input,
                                        XXH64_hash_t const seed)
 {
     if (length <= 16)
+    {
         return XXH3_len_0to16_64b(input, length, secret, seed);
+    }
     if (length <= 128)
+    {
         return XXH3_len_17to128_64b(input, length, secret, seed);
+    }
     return XXH3_len_129to240_64b(input, length, secret, seed);
 }
 
@@ -441,7 +457,8 @@ static void XXH3_accumulate_512_64b(uint64_t *const acc,
                                     uint8_t const *const secret)
 {
     size_t i;
-    for (i = 0; i < ACC_NB; i++) {
+    for (i = 0; i < ACC_NB; i++)
+    {
         uint64_t input_val = XXH_read64(input  + (8 * i));
         acc[i]    += input_val;
         input_val ^= XXH_read64(secret + (8 * i));
@@ -453,7 +470,8 @@ static void XXH3_accumulate_512_64b(uint64_t *const acc,
 static void XXH3_scrambleAcc(uint64_t *const acc, uint8_t const *const secret)
 {
     size_t i;
-    for (i = 0; i < ACC_NB; i++) {
+    for (i = 0; i < ACC_NB; i++)
+    {
         acc[i] ^= acc[i] >> 47;
         acc[i] ^= XXH_read64(secret + (8 * i));
         acc[i] *= PRIME32_1;
@@ -467,7 +485,8 @@ static void XXH3_accumulate_64b(uint64_t *const acc,
                                 size_t const nb_stripes)
 {
     size_t n;
-    for (n = 0; n < nb_stripes; n++) {
+    for (n = 0; n < nb_stripes; n++)
+    {
         XXH3_accumulate_512_64b(acc, input + n * STRIPE_LEN, secret + (8 * n));
     }
 }
@@ -487,7 +506,9 @@ static XXH64_hash_t XXH3_mergeAccs(uint64_t const *const acc, uint8_t const *con
     uint64_t result64 = start;
     size_t i = 0;
     for (i = 0; i < 4; i++)
-         result64 += XXH3_mix2Accs(acc + 2 * i, key + 16 * i);
+    {
+        result64 += XXH3_mix2Accs(acc + 2 * i, key + 16 * i);
+    }
 
     return XXH3_avalanche(result64);
 }
@@ -514,7 +535,8 @@ static XXH64_hash_t XXH3_hashLong_64b(uint8_t const *const input,
     acc[6] = PRIME64_5;
     acc[7] = PRIME32_1;
 
-    for (n = 0; n < nb_blocks; n++) {
+    for (n = 0; n < nb_blocks; n++)
+    {
         XXH3_accumulate_64b(acc, input + n * block_len, secret, nb_rounds);
         XXH3_scrambleAcc(acc, secret + secret_size - STRIPE_LEN);
     }
@@ -523,7 +545,8 @@ static XXH64_hash_t XXH3_hashLong_64b(uint8_t const *const input,
     XXH3_accumulate_64b(acc, input + nb_blocks * block_len, secret, nb_stripes);
 
     /* last stripe */
-    if (length % STRIPE_LEN != 0) {
+    if (length % STRIPE_LEN != 0)
+    {
         uint8_t const *const p = input + length - STRIPE_LEN;
         /* Do not align on 8, so that the secret is different from the scrambler */
 #define XXH_SECRET_LASTACC_START 7
@@ -538,13 +561,14 @@ static XXH64_hash_t XXH3_hashLong_64b(uint8_t const *const input,
 
 /* Hashes a long input, > 240 bytes */
 static XXH64_hash_t XXH3_hashLong_64b_withSeed(uint8_t const *const input,
-                                               size_t const length,
-                                               XXH64_hash_t const seed)
+        size_t const length,
+        XXH64_hash_t const seed)
 {
     uint8_t secret[XXH_SECRET_DEFAULT_SIZE];
     size_t i;
 
-    for (i = 0; i < XXH_SECRET_DEFAULT_SIZE / 16; i++) {
+    for (i = 0; i < XXH_SECRET_DEFAULT_SIZE / 16; i++)
+    {
         XXH_write64(secret + (16 * i),     XXH_read64(kSecret + (16 * i))     + seed);
         XXH_write64(secret + (16 * i) + 8, XXH_read64(kSecret + (16 * i) + 8) - seed);
     }
@@ -560,7 +584,9 @@ static XXH64_hash_t XXH3_hashLong_64b_withSeed(uint8_t const *const input,
 XXH64_hash_t XXH3_64bits_withSeed(void const *const input, size_t const length, XXH64_hash_t const seed)
 {
     if (length <= XXH3_MIDSIZE_MAX)
+    {
         return XXH3_hashShort_64b((uint8_t const *)input, length, kSecret, seed);
+    }
     return XXH3_hashLong_64b_withSeed((uint8_t const *)input, length, seed);
 }
 
@@ -586,16 +612,19 @@ bool load(const char *dictionary)
 {
     // Get file descriptor of dictionary, opening it as read-only. https://linuxhint.com/using_mmap_function_linux/
     int file_descriptor = open(dictionary, O_RDONLY);
-    if(file_descriptor < 0){
+    if (file_descriptor < 0)
+    {
         printf("ERROR: %d. Failed to `open` \"%s\" for reading.\n", errno, dictionary);
         return false;
     }
-    if(fstat(file_descriptor, &stat_buffer) < 0){
+    if (fstat(file_descriptor, &stat_buffer) < 0)
+    {
         printf("ERROR: %d. Faied to `stat` \"%s\".\n", errno, dictionary);
         return false;
     }
     dictionary_pointer = mmap(NULL, stat_buffer.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, file_descriptor, 0);
-    if(dictionary_pointer == MAP_FAILED){
+    if (dictionary_pointer == MAP_FAILED)
+    {
         printf("ERROR: %d. Faied to `mmap` \"%s\".\n", errno, dictionary);
         return false;
     }
@@ -603,13 +632,15 @@ bool load(const char *dictionary)
 
     // Iterate through characters in the memory map, replace \n with \0, storing address of start of word in a new index (word_count) in keys array, setting table[hash(lowercase_word)] = word_count, and incrementing word_count
     char *word_address = &dictionary_pointer[0];
-    for (int dictionary_index = 0; dictionary_index < stat_buffer.st_size; ++dictionary_index) {
-        if (dictionary_pointer[dictionary_index] == '\n') {
+    for (int dictionary_index = 0; dictionary_index < stat_buffer.st_size; ++dictionary_index)
+    {
+        if (dictionary_pointer[dictionary_index] == '\n')
+        {
             dictionary_pointer[dictionary_index] = '\0';
             keys[word_count] = word_address;
-    char lowercase_word[45] = "";
-    int word_length = strlen(word_address);
-    lowercase(word_address, lowercase_word, word_length);
+            char lowercase_word[45] = "";
+            int word_length = strlen(word_address);
+            lowercase(word_address, lowercase_word, word_length);
             table[hash(lowercase_word)] = word_count;
             ++word_count;
             word_address = &dictionary_pointer[dictionary_index + 1];
