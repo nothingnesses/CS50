@@ -3,14 +3,14 @@
 #include <stdbool.h>
 
 #include "dictionary.h"
-
-// Represents a node in a hash table
-typedef struct node
-{
-    char word[LENGTH + 1];
-    struct node *next;
-}
-node;
+#include <sys/mman.h> // mmap
+#include <errno.h> // errno
+#include <string.h>   /* memcpy, tolower*/
+#include <ctype.h> // tolower
+#include <stdio.h> // printf
+#include <sys/stat.h>  // open
+#include <fcntl.h> // open
+#include <unistd.h> // close
 
 /*
 Assume we have 4G of memory available and each pointer is 8B.
@@ -21,14 +21,37 @@ Closest power of 2 less than 500000000 = 2^28 = 268435456.
 // Number of buckets in hash table
 const unsigned int N = 268435456;
 
+// Keys. 144000 for safety because amount of words in dictionary is ~143000. Used to store pointers to the words in the `mmap`ed dictionary.
+char *keys[144000];
+
+// Number of words
+int word_count = 0;
+
 // Hash table
-node *table[N];
+int table[N];
+
+// Pointer to be used for the `mmap`ed dictionary file later on.
+char *dictionary_pointer = NULL;
+
+// Used for `munmap` later
+struct stat stat_buffer;
+
+// Converts a string to lowercase
+void lowercase(char *input, char *buffer, int input_length) {
+    for (int word_index = 0; word_index < input_length; ++word_index) {
+        buffer[word_index] = tolower(input[word_index]);
+    }
+    buffer[input_length] = '\0';
+}
 
 // Returns true if word is in dictionary else false
 bool check(const char *word)
 {
-    // TODO
-    return false;
+    // Convert word to lowercase, hash, etc.
+    char lowercase_word[45] = "";
+    int word_length = strlen(word);
+    lowercase((char *)word, lowercase_word, word_length);
+    return (strcmp(keys[table[hash(lowercase_word)]], lowercase_word) == 0);
 }
 
 /*
@@ -77,7 +100,6 @@ bool check(const char *word)
 
 #include <stddef.h>   /* size_t */
 #include <stdint.h>   /* uint8_t, uint32_t, uint64_t */
-#include <string.h>   /* memcpy */
 
 typedef uint64_t XXH64_hash_t;
 
@@ -562,20 +584,48 @@ unsigned int hash(const char *word)
 // Loads dictionary into memory, returning true if successful else false
 bool load(const char *dictionary)
 {
-    // TODO
-    return false;
+    // Get file descriptor of dictionary, opening it as read-only. https://linuxhint.com/using_mmap_function_linux/
+    int file_descriptor = open(dictionary, O_RDONLY);
+    if(file_descriptor < 0){
+        printf("ERROR: %d. Failed to `open` \"%s\" for reading.\n", errno, dictionary);
+        return false;
+    }
+    if(fstat(file_descriptor, &stat_buffer) < 0){
+        printf("ERROR: %d. Faied to `stat` \"%s\".\n", errno, dictionary);
+        return false;
+    }
+    dictionary_pointer = mmap(NULL, stat_buffer.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, file_descriptor, 0);
+    if(dictionary_pointer == MAP_FAILED){
+        printf("ERROR: %d. Faied to `mmap` \"%s\".\n", errno, dictionary);
+        return false;
+    }
+    close(file_descriptor);
+
+    // Iterate through characters in the memory map, replace \n with \0, storing address of start of word in a new index (word_count) in keys array, setting table[hash(lowercase_word)] = word_count, and incrementing word_count
+    char *word_address = &dictionary_pointer[0];
+    for (int dictionary_index = 0; dictionary_index < stat_buffer.st_size; ++dictionary_index) {
+        if (dictionary_pointer[dictionary_index] == '\n') {
+            dictionary_pointer[dictionary_index] = '\0';
+            keys[word_count] = word_address;
+    char lowercase_word[45] = "";
+    int word_length = strlen(word_address);
+    lowercase(word_address, lowercase_word, word_length);
+            table[hash(lowercase_word)] = word_count;
+            ++word_count;
+            word_address = &dictionary_pointer[dictionary_index + 1];
+        }
+    }
+    return true;
 }
 
 // Returns number of words in dictionary if loaded else 0 if not yet loaded
 unsigned int size(void)
 {
-    // TODO
-    return 0;
+    return word_count;
 }
 
 // Unloads dictionary from memory, returning true if successful else false
 bool unload(void)
 {
-    // TODO
-    return false;
+    return (munmap(dictionary_pointer, stat_buffer.st_size) == 0);
 }
