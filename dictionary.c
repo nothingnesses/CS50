@@ -29,7 +29,7 @@ Use a power of 2 to make bitwise operation in `hash` funciton easier.
 We're using 2^27 because it's the largest value that still compiles
 */
 // Number of buckets in hash table
-const unsigned int N = 134217728;
+const unsigned int N = 65536;
 
 // Used to store pointers to the words in the `mmap`ed dictionary.
 char *keys[MAX_WORD_COUNT];
@@ -607,7 +607,7 @@ XXH64_hash_t XXH3_64bits(void const *const input, size_t const length)
 unsigned int hash(const char *word)
 {
     // Return 27 least significant bits (number of buckets = 2^27)
-    return XXH3_64bits(word, sizeof(word)) & 0x7FFFFFF;
+    return XXH3_64bits(word, sizeof(word)) & 0xFFFF;
 }
 
 // Loads dictionary into memory, returning true if successful else false
