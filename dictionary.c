@@ -25,22 +25,20 @@ typedef struct node
 node;
 
 /*
-Assume we have 4G of memory available and each pointer is 8B.
-4000000000 / 8 = 500000000.
-Use a power of 2 to make bitwise operation in hash funciton easier.
-Closest power of 2 less than 500000000 = 2^28 = 268435456.
+Use a power of 2 to make bitwise operation in `hash` funciton easier.
+We're using 2^27 because it's the largest value that still compiles
 */
 // Number of buckets in hash table
-const unsigned int N = 16777216;
+const unsigned int N = 134217728;
 
-// Keys. Used to store pointers to the words in the `mmap`ed dictionary.
+// Used to store pointers to the words in the `mmap`ed dictionary.
 char *keys[MAX_WORD_COUNT];
 
 // Index for nodes
 int nodes_index = 0;
 
-// Memory for nodes. Used to store linked nodes so we don't have to malloc
-node *nodes[MAX_WORD_COUNT];
+// Initialise memory for nodes so we don't have to malloc
+node nodes[MAX_WORD_COUNT];
 
 // Number of words
 int word_count = 0;
@@ -51,7 +49,7 @@ node *table[N];
 // Pointer to be used for the `mmap`ed dictionary file later on.
 char *dictionary_pointer = NULL;
 
-// Used for `munmap` later
+// Used for `munmap` later in `unload`
 struct stat stat_buffer;
 
 // Converts a string to lowercase
@@ -608,8 +606,8 @@ XXH64_hash_t XXH3_64bits(void const *const input, size_t const length)
 // Hashes word to a number
 unsigned int hash(const char *word)
 {
-    // Return 28 least significant bits (number of buckets = 2^28)
-    return XXH3_64bits(word, sizeof(word)) & 0xffffff;
+    // Return 27 least significant bits (number of buckets = 2^27)
+    return XXH3_64bits(word, sizeof(word)) & 0x7FFFFFF;
 }
 
 // Loads dictionary into memory, returning true if successful else false
@@ -632,7 +630,7 @@ bool load(const char *dictionary)
     }
     close(file_descriptor);
 
-    // Iterate through characters in the memory map, replace \n with \0, storing address of start of word in a new index (word_count) in keys array, setting table[hash(lowercase_word)] = word_count (i.e., the index in keys which returns the address of the start of a word when accessed), and incrementing word_count
+    // Iterate through characters in the memory map
     char *word_address = &dictionary_pointer[0];
     for (int dictionary_index = 0; dictionary_index < stat_buffer.st_size; ++dictionary_index) {
         if (dictionary_pointer[dictionary_index] == '\n') {
@@ -648,19 +646,19 @@ bool load(const char *dictionary)
             int digest = hash(lowercase_word);
             // Write the key index information into the next available node, add the address of this node into the table, then increment the node index
             // Set the key index of this node to the word count (the index used to store the word's address to the keys array) then increment word count
-            nodes[nodes_index]->keys_index = word_count++;
+            nodes[nodes_index].keys_index = word_count++;
             // Check if this is the first node in this bucket
             if (table[digest] == NULL) {
               // This is the first node of this bucket
               // Set the next pointer of current node to NULL
-              nodes[nodes_index]->next = NULL;
+              nodes[nodes_index].next = NULL;
             } else {
               // This is not the first node in this bucket
               // Set the next pointer to the current head of this bucket (the previous first node in this bucket)
-              nodes[nodes_index]->next = table[digest];
+              nodes[nodes_index].next = table[digest];
             }
             // Set the element in table indexed by the hash digest of the lowercased word to be equal to the address of this node and increment the nodes_index
-            table[digest] = nodes[nodes_index++];
+            table[digest] = &nodes[nodes_index++];
             // Set address to the next character after null character, i.e., start of next word
             word_address = &dictionary_pointer[dictionary_index + 1];
         }
