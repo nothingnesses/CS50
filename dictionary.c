@@ -13,8 +13,8 @@
 #include <unistd.h> // close
 #include <strings.h> // strcasecmp
 
-// 144000 for safety because amount of words in dictionary is ~143000.
-#define MAX_WORD_COUNT 144000
+// 143100 for safety because amount of words in dictionary is ~143000.
+#define MAX_WORD_COUNT 143100
 
 // Represents a node in a hash table
 typedef struct node
