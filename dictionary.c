@@ -114,7 +114,7 @@ bool load(const char *dictionary)
         printf("ERROR: %d. Failed to `stat` \"%s\".\n", errno, dictionary);
         return false;
     }
-    dictionary_pointer = mmap(NULL, stat_buffer.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
+    dictionary_pointer = mmap(NULL, stat_buffer.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, file_descriptor, 0);
     if (dictionary_pointer == MAP_FAILED)
     {
         printf("ERROR: %d. Failed to `mmap` \"%s\".\n", errno, dictionary);
@@ -140,13 +140,13 @@ bool load(const char *dictionary)
             {
                 // This is the first node of this bucket
                 // Set the next pointer of current node to NULL
-                nodes[nodes_index++].next = NULL;
+                nodes[nodes_index].next = NULL;
             }
             else
             {
                 // This is not the first node in this bucket
                 // Set the next pointer to the current head of this bucket (the previous first node in this bucket)
-                nodes[nodes_index++].next = table[digest];
+                nodes[nodes_index].next = table[digest];
             }
             // Add this node the the hash table and increment the node index so we can use the next available one later
             table[digest] = &nodes[nodes_index++];
