@@ -150,6 +150,8 @@ bool load(const char *dictionary)
             }
             // Add this node the the hash table and increment the node index so we can use the next available one later
             table[digest] = &nodes[nodes_index++];
+            // Increment word count
+            ++word_count;
             // Set address to the next character after null character, i.e., the start of next word
             word_address = &dictionary_pointer[dictionary_index + 1];
         }
