@@ -26,10 +26,10 @@ node;
 
 /*
 Use a power of 2 to make bitwise operation in `hash` funciton easier.
-We're using 2^20 because it seems optimal
+We're using 2^16 because it seems optimal
 */
 // Number of buckets in hash table
-const unsigned int N = 1048576;
+const unsigned int N = 65535;
 
 // Index for nodes
 int nodes_index = 0;
@@ -95,8 +95,8 @@ unsigned long djb2(unsigned char *str)
 // Hashes word to a number
 unsigned int hash(const char *word)
 {
-    // Return 20 least significant bits (number of buckets = 2^20)
-    return djb2((unsigned char *)word) & 0xFFFFF;
+    // Return 20 least significant bits (number of buckets = 2^16)
+    return djb2((unsigned char *)word) & 0xFFFF;
 }
 
 // Loads dictionary into memory, returning true if successful else false
