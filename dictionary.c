@@ -13,9 +13,6 @@
 #include <unistd.h> // close
 #include <strings.h> // strcasecmp
 
-// 143100 for safety because amount of words in dictionary is ~143000.
-#define MAX_WORD_COUNT 143100
-
 // Represents a node in a hash table
 typedef struct node
 {
@@ -34,8 +31,8 @@ const unsigned int N = 65535;
 // Index for nodes
 int nodes_index = 0;
 
-// Initialise memory for nodes so we don't have to malloc
-node nodes[MAX_WORD_COUNT];
+// Initialise memory for nodes so we don't have to malloc. 143100 for safety because amount of words in dictionary is ~143000.
+node nodes[143100];
 
 // Number of words
 int word_count = 0;
@@ -95,7 +92,7 @@ unsigned long djb2(unsigned char *str)
 // Hashes word to a number
 unsigned int hash(const char *word)
 {
-    // Return 20 least significant bits (number of buckets = 2^16)
+    // Return 16 least significant bits (number of buckets = 2^16)
     return djb2((unsigned char *)word) & 0xFFFF;
 }
 
