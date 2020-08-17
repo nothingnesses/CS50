@@ -19,7 +19,7 @@
 // Represents a node in a hash table
 typedef struct node
 {
-    int keys_index;
+    char *word_address;
     struct node *next;
 }
 node;
@@ -30,9 +30,6 @@ We're using 2^20 because it seems optimal
 */
 // Number of buckets in hash table
 const unsigned int N = 1048576;
-
-// Used to store pointers to the words in the `mmap`ed dictionary.
-char *keys[MAX_WORD_COUNT];
 
 // Index for nodes
 int nodes_index = 0;
@@ -52,22 +49,17 @@ char *dictionary_pointer = NULL;
 // Used for `munmap` later in `unload`
 struct stat stat_buffer;
 
-// Converts a string to lowercase
-void lowercase(char *input, char *buffer, int input_length)
-{
-    for (int word_index = 0; word_index < input_length; ++word_index)
-    {
-        buffer[word_index] = tolower(input[word_index]);
-    }
-    buffer[input_length] = '\0';
-}
-
 // Returns true if word is in dictionary else false
 bool check(const char *word)
 {
     // Convert word to lowercase, hash, etc.
     char lowercase_word[45] = {0};
-    lowercase((char *)word, lowercase_word, strlen(word));
+    int word_length = strlen(word);
+    for (int word_index = 0; word_index < word_length; ++word_index)
+    {
+        lowercase_word[word_index] = tolower(word[word_index]);
+    }
+    lowercase_word[word_length] = '\0';
     // Get the hash digest of the lowercased word
     int digest = hash(lowercase_word);
     // Check if bucket is empty
@@ -76,7 +68,7 @@ bool check(const char *word)
         // This bucket isn't empty, iterate through linked list to find a match
         for (node *current_node = table[digest]; current_node != NULL; current_node = current_node->next)
         {
-            if (strcasecmp(keys[current_node->keys_index], word) == 0)
+            if (strcasecmp(current_node->word_address, word) == 0)
             {
                 return true;
             }
@@ -119,54 +111,46 @@ bool load(const char *dictionary)
     }
     if (fstat(file_descriptor, &stat_buffer) < 0)
     {
-        printf("ERROR: %d. Faied to `stat` \"%s\".\n", errno, dictionary);
+        printf("ERROR: %d. Failed to `stat` \"%s\".\n", errno, dictionary);
         return false;
     }
-    dictionary_pointer = mmap(NULL, stat_buffer.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, file_descriptor, 0);
+    dictionary_pointer = mmap(NULL, stat_buffer.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
     if (dictionary_pointer == MAP_FAILED)
     {
-        printf("ERROR: %d. Faied to `mmap` \"%s\".\n", errno, dictionary);
+        printf("ERROR: %d. Failed to `mmap` \"%s\".\n", errno, dictionary);
         return false;
     }
     close(file_descriptor);
 
     // Iterate through characters in the memory map
     char *word_address = &dictionary_pointer[0];
-    // Initialise the lowercase output buffer
-    char lowercase_word[45];
+    int digest;
     for (int dictionary_index = 0; dictionary_index < stat_buffer.st_size; ++dictionary_index)
     {
         if (dictionary_pointer[dictionary_index] == '\n')
         {
             // Change newline to null
             dictionary_pointer[dictionary_index] = '\0';
-            // Store pointer to word in key
-            keys[word_count] = word_address;
-            // Clear the buffer used for the output of converting word to lowercase
-            lowercase_word[0] = '\0';
-            // Convert word to lowercase
-            lowercase(word_address, lowercase_word, strlen(word_address));
             // Get the hash digest of the lowercased word
-            int digest = hash(lowercase_word);
-            // Write the key index information into the next available node, add the address of this node into the table, then increment the node index
-            // Set the key index of this node to the word count (the index used to store the word's address to the keys array) then increment word count
-            nodes[nodes_index].keys_index = word_count++;
+            digest = hash(word_address);
+            // Set the stored word address of the current available node to the current word's address
+            nodes[nodes_index].word_address = word_address;
             // Check if this is the first node in this bucket
             if (table[digest] == NULL)
             {
                 // This is the first node of this bucket
                 // Set the next pointer of current node to NULL
-                nodes[nodes_index].next = NULL;
+                nodes[nodes_index++].next = NULL;
             }
             else
             {
                 // This is not the first node in this bucket
                 // Set the next pointer to the current head of this bucket (the previous first node in this bucket)
-                nodes[nodes_index].next = table[digest];
+                nodes[nodes_index++].next = table[digest];
             }
-            // Set the element in table indexed by the hash digest of the lowercased word to be equal to the address of this node and increment the nodes_index
+            // Add this node the the hash table and increment the node index so we can use the next available one later
             table[digest] = &nodes[nodes_index++];
-            // Set address to the next character after null character, i.e., start of next word
+            // Set address to the next character after null character, i.e., the start of next word
             word_address = &dictionary_pointer[dictionary_index + 1];
         }
     }
