@@ -7,16 +7,13 @@ def get_repeat_counts(repeat_sequences, text_file_sequence):
     sequence_length = len(text_file_sequence)
     for repeat_sequence in repeat_sequences:
         maximum_repeat_count = 0
-        maximum_repeat_starting_index = -1
         current_repeat_count = 0
-        current_repeat_starting_index = -1
         repeat_length = len(repeat_sequence)
         sequence_index = 0
         # iterate through input sequence characters
         while sequence_length > sequence_index:
             if text_file_sequence[sequence_index:sequence_index + repeat_length] == repeat_sequence:
                 # current character is the start of a repeat
-                current_repeat_starting_index = sequence_index
                 current_repeat_count = 1
                 sequence_index += repeat_length
                 # check repeat count
@@ -29,7 +26,6 @@ def get_repeat_counts(repeat_sequences, text_file_sequence):
                         is_repeat = False
                         if current_repeat_count > maximum_repeat_count:
                             maximum_repeat_count = current_repeat_count
-                            maximum_repeat_starting_index = current_repeat_starting_index
             sequence_index += 1
         output.append(str(maximum_repeat_count))
     return output
