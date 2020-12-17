@@ -1,0 +1,20 @@
+{
+  "name": "bitburner_scripts",
+  "version": "0.1.0",
+  "description": "Scripts for the game \"Bitburner\".",
+  "main": "index.js",
+  "dependencies": {
+    "http-server": "^0.12.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "http-server -p 8080 -a 127.0.0.1 --cors -c-1",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bitburner",
+    "netscript"
+  ],
+  "author": "Jesse Ira Abadilla",
+  "license": "BlueOak-1.0.0"
+}
