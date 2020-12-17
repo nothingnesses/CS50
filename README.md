@@ -9,7 +9,7 @@ Scripts for the game [Bitburner](https://github.com/danielyxie/bitburner). These
 ### Semi-automatic Installation
 1. Install [Node](https://nodejs.org/en/download/package-manager/).
 2. Clone this repository to a local directory.
-3. From a terminal/command prompt, navigate to that directory, run `npm` (to install dependencies), then `npm start` (to start the install server).
+3. From a terminal/command prompt, navigate to that directory, run `npm install` (to install dependencies), then `npm start` (to start the install server).
 4. In-game, save the "nicoty.bin.installer.js" (2.6 GB) file to the root directory of a rooted server (one with at least enough RAM to run "nicoty.sbin.hacker.js", e.g. "foodnstuff"), then run it without any extra arguments, i.e., with `run nicoty.bin.installer.js`.
 5. Exit from `npm` (i.e., using `Ctrl-C` if ran from a POSIX-compliant terminal).
 
